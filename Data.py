@@ -41,7 +41,6 @@ class Base:
 		self.cursor.execute(f"PRAGMA table_info('{name_table}')") 
 		return len(self.cursor.fetchall())
 		
-
 	def get_all_table(self, name_table="urls"):
 		self.cursor.execute(f"SELECT * FROM {name_table}")
 		return self.cursor.fetchall()
@@ -98,7 +97,6 @@ class SearchTemplates(Base):
 class BlackList(SearchTemplates):
 	""" """
 	pass
-
 
 class VisitsList(Base):
 	""" """
