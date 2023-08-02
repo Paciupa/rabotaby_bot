@@ -1,13 +1,13 @@
 import asyncio
 from aiogram import Bot, Dispatcher, executor, types
+from aiogram.dispatcher import FSMContext
+from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
-# from aiogram.dispatcher import FSMContext
-# from aiogram.dispatcher.filters.state import StatesGroup, State
-# from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-# Файлик с API токеном и id пользователя
-import config
-bot = Bot(token=config.API_TOKEN)
+from Data import SearchTemplates, BlackList, VisitsList
+st = SearchTemplates("SearchTemplates.db")
+bl = BlackList("BlackList.db")
+vl = VisitsList("SearchTemplates.db")
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
 from os import environ
