@@ -84,5 +84,28 @@ async def add_T_url(message: types.Message, state:FSMContext):
 	st.create_new_row(wordkey, url)
 	await bot.send_message(message.chat.id, "✅ Новый шаблон добавлен в базу!")
 	await state.set_state(CS.AVAILABLE)
+
+@dp.message_handler(commands=['del_T'], state=CS.AVAILABLE)
+async def del_T_msg(message: types.Message, state:FSMContext):
+	await bot.send_message(message.chat.id, "Укажите номер шаблона.\nЧтобы узнать номер введите /print_T")
+	await state.set_state(CS.DEL_T)
+
+@dp.message_handler(state=CS.DEL_T)
+async def del_T_input(message: types.Message, state:FSMContext):
+	msg = message.text
+	try:
+		number_templece = int(msg)
+		if number_templece > 0 and number_templece <= st.get_num_all_rows():
+			st.delete_row_by_number(number_templece)
+			await bot.send_message(message.chat.id, "✅ Номер шаблона успешно удалён!")
+			await state.set_state(CS.AVAILABLE)
+		else:
+			await bot.send_message(message.chat.id, "❌ Такой номер в базе отсутсвует. Введите корректный!")
+	except:
+		if msg == "/print_T":
+			await print_T(message, state)
+		else:
+			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из списка")
+	
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
