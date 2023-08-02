@@ -60,7 +60,7 @@ class SearchTemplates(Base):
 	""" """
 	create_table_query = """
 		CREATE TABLE IF NOT EXISTS urls (
-			num INTEGER NOT NULL,
+			number INTEGER NOT NULL,
 			key TEXT NOT NULL,
 			url TEXT NOT NULL);
 		"""
@@ -75,7 +75,7 @@ class SearchTemplates(Base):
 
 	def delete_row_by_number(self, number, name_table="urls"):
 		""" Удаляем строку по номеру """
-		self.cursor.execute(f"DELETE FROM {name_table} WHERE num=?", (number,))
+		self.cursor.execute(f"DELETE FROM {name_table} WHERE number=?", (number,))
 
 		self.saving_changes()
 
@@ -85,7 +85,7 @@ class SearchTemplates(Base):
 	def __update_col_num(self, name_table="urls"):
 		""" Обновляем числа в столбце num """
 		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца num.
-		self.cursor.execute(f"SELECT * FROM {name_table} ORDER BY num")
+		self.cursor.execute(f"SELECT * FROM {name_table} ORDER BY number")
 		rows = self.cursor.fetchall()
 		
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
@@ -96,7 +96,7 @@ class SearchTemplates(Base):
 		for new_number in list_new_numbers:
 			# получаем старое значение num в строке, чтобы потом его заменить на новое
 			old_number = rows[new_number-1][0]
-			self.cursor.execute(f"UPDATE {name_table} SET num = ? WHERE num = ?", (new_number, old_number))
+			self.cursor.execute(f"UPDATE {name_table} SET number = ? WHERE number = ?", (new_number, old_number))
 
 		self.saving_changes()
 	
