@@ -107,5 +107,15 @@ async def del_T_input(message: types.Message, state:FSMContext):
 		else:
 			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из списка")
 	
+
+@dp.message_handler(commands=['print_T'], state=[
+	CS.AVAILABLE, CS.ADD_T1, CS.ADD_T2, 
+	CS.ADD_B1, CS.ADD_B2, CS.DEL_T, CS.DEL_B])
+async def print_T(message: types.Message, state:FSMContext):
+	final_msg = "Список шаблонов\n\n"
+	for line in st.get_all_table():
+		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
+
+	await bot.send_message(message.chat.id, final_msg)
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
