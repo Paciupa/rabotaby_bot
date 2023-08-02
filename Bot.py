@@ -34,12 +34,14 @@ async def is_user_ID(message):
 	return message.from_user.id == int(user_id)
 
 @dp.message_handler(commands=['start'])  
-async def cmd_start(message: types.Message):
+async def cmd_start(message: types.Message, state:FSMContext):
 	await asyncio.sleep(0.5)
+	# Только пользователь с допустимым ID сможет получить доступ к боту
 	if await is_user_ID(message):
-		await bot.send_message(message.chat.id, "Привет!")
+		await bot.send_message(message.chat.id, "🖐 Hola! \nВведите /help для доступа к командам")
+		await state.set_state(CS.AVAILABLE)
 	else:
-		await bot.send_message(message.chat.id, "Please leave this chat. You're an unregistered user\nПрошу покинуть этот чат. Вы незарегистрированный пользователь")
+		await bot.send_message(message.chat.id, "❌  Please leave this chat. You're an unregistered user\nПрошу покинуть этот чат. Вы незарегистрированный пользователь")
 
 
 @dp.message_handler(commands=['help'], state=CS.AVAILABLE)
