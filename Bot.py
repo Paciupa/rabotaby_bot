@@ -55,5 +55,34 @@ async def help(message: types.Message, state:FSMContext):
 	/del_B Удалить адрес из чёрного списка
 	/print_B Вывести все адреса чёрного списка
 	""")
+
+@dp.message_handler(commands=['add_T'], state=CS.AVAILABLE)
+async def add_T(message: types.Message, state:FSMContext):
+	await bot.send_message(message.chat.id, "1️⃣ Введите слово ключ шаблона")
+	await state.set_state(CS.ADD_T1)
+
+@dp.message_handler(state=CS.ADD_T1)
+async def add_T_key(message: types.Message, state:FSMContext):
+	wordkey = message.text
+	# Проверка, на уникальность. Существует ли таке слово ключ в базе шаблонов
+	if wordkey in st.get_col_by_name("key"):
+		await bot.send_message(message.chat.id, "❌ Такое слово ключ уже существует. Введите другое слово ключ")
+	else:
+		# Сохраняем полученное значение
+		await state.update_data(WORDKEY=wordkey)
+		await state.set_state(CS.ADD_T2)
+		await bot.send_message(message.chat.id, "✅ Слово ключ - сохранён!")
+		await bot.send_message(message.chat.id, "2️⃣ Введите url для добавления в базу")
+
+@dp.message_handler(state=CS.ADD_T2)
+async def add_T_url(message: types.Message, state:FSMContext):
+	# Извлекаем wordkey
+	data = await state.get_data()
+	wordkey = data.get("WORDKEY")
+	# Получаем url
+	url = message.text
+	st.create_new_row(wordkey, url)
+	await bot.send_message(message.chat.id, "✅ Новый шаблон добавлен в базу!")
+	await state.set_state(CS.AVAILABLE)
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
