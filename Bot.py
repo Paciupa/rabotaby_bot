@@ -19,12 +19,16 @@ bot = Bot(token=telegram_key)
 # MemoryStorage. Храним состояния в оператиной памяти. Заменить на другой тип хранения
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
-# Определение класса состояний. Состояния нужны для того, чтобы кнопки с одинаковыми названиями, не смогли с друг другом конфликтовать.
-# class ClientState(StatesGroup):
-# 	ANONYMOUS = State()
 
-# from FastStorage import FstSrg
-# fs = FstSrg()
+# Определение класса состояний. 
+class CS(StatesGroup):
+	AVAILABLE = State()
+	ADD_T1 = State()
+	ADD_T2 = State()
+	ADD_B1 = State()
+	ADD_B2 = State()
+	DEL_T = State()
+	DEL_B = State()
 
 async def is_user_ID(message):
 	return message.from_user.id == config.USER_ID
