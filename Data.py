@@ -44,6 +44,12 @@ class Base:
 	def get_all_table(self, name_table="urls"):
 		self.cursor.execute(f"SELECT * FROM {name_table}")
 		return self.cursor.fetchall()
+	
+	def get_col_by_name(self, col_name, name_table="urls"):
+		""" Возвращает весь столбец по имени """
+		self.cursor.execute(f"SELECT {col_name} FROM {name_table}")
+		raw_list_of_keys = self.cursor.fetchall()
+		return [key[0] for key in raw_list_of_keys]
 
 	def close(self):
 		self.saving_changes()
