@@ -144,5 +144,27 @@ async def add_B_url(message: types.Message, state:FSMContext):
 	bl.create_new_row(wordkey, url)
 	await bot.send_message(message.chat.id, "✅ Исключение добавлено в чёрный список!")
 	await state.set_state(CS.AVAILABLE)
+
+@dp.message_handler(commands=['del_B'], state=CS.AVAILABLE)
+async def del_B_msg(message: types.Message, state:FSMContext):
+	await bot.send_message(message.chat.id, "Укажите номер исключения для удаления.\nЧтобы узнать номер введите /print_B")
+	await state.set_state(CS.DEL_B)
+
+@dp.message_handler(state=CS.DEL_B)
+async def del_B_input(message: types.Message, state:FSMContext):
+	msg = message.text
+	try:
+		number_exception = int(msg)
+		if number_exception > 0 and number_exception <= bl.get_num_all_rows():
+			bl.delete_row_by_number(number_exception)
+			await bot.send_message(message.chat.id, "✅ Номер исключения успешно удалён!")
+			await state.set_state(CS.AVAILABLE)
+		else:
+			await bot.send_message(message.chat.id, "❌ Такой номер в чёрном списке отсутсвует. Введите корректный!")
+	except:
+		if msg == "/print_B":
+			await print_B(message, state)
+		else:
+			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из чёрного списка")
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
