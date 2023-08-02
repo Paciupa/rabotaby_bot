@@ -42,5 +42,18 @@ async def cmd_start(message: types.Message):
 		await bot.send_message(message.chat.id, "Please leave this chat. You're an unregistered user\nПрошу покинуть этот чат. Вы незарегистрированный пользователь")
 
 
+@dp.message_handler(commands=['help'], state=CS.AVAILABLE)
+async def help(message: types.Message, state:FSMContext):
+	await bot.send_message(message.chat.id, """
+	Шаблоны поиска
+	/add_T Добавить шаблон поиска
+	/del_T Удалить шаблон поиска
+	/print_T Вывести все шаблоны поиска
+
+	Чёрный список
+	/add_B Добавить адрес из чёрного списка
+	/del_B Удалить адрес из чёрного списка
+	/print_B Вывести все адреса чёрного списка
+	""")
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
