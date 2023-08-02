@@ -166,5 +166,16 @@ async def del_B_input(message: types.Message, state:FSMContext):
 			await print_B(message, state)
 		else:
 			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из чёрного списка")
+	
+@dp.message_handler(commands=['print_B'], state=[
+	CS.AVAILABLE, CS.ADD_T1, CS.ADD_T2, 
+	CS.ADD_B1, CS.ADD_B2, CS.DEL_T, CS.DEL_B])
+async def print_B(message: types.Message, state:FSMContext):
+	final_msg = "Чёрный список\n\n"
+	for line in bl.get_all_table():
+		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
+
+	await bot.send_message(message.chat.id, final_msg)
+
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
