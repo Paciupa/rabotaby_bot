@@ -9,6 +9,13 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import config
 bot = Bot(token=config.API_TOKEN)
 
+# Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
+from os import environ
+telegram_key = environ.get('API_TELEGRAM_KEY')
+user_id = environ.get('USER_ID')
+# Подключаемся к боту
+bot = Bot(token=telegram_key)
+
 # MemoryStorage. Храним состояния в оператиной памяти. Заменить на другой тип хранения
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
