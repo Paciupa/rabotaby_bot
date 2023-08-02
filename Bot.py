@@ -117,5 +117,30 @@ async def print_T(message: types.Message, state:FSMContext):
 		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
 
 	await bot.send_message(message.chat.id, final_msg)
+
+@dp.message_handler(commands=['add_B'], state=CS.AVAILABLE)
+async def add_B(message: types.Message, state:FSMContext):
+	await bot.send_message(message.chat.id, "1️⃣ Введите слово ключ для чёрного списка")
+	await state.set_state(CS.ADD_B1)
+
+@dp.message_handler(state=CS.ADD_B1)
+async def add_B_key(message: types.Message, state:FSMContext):
+	wordkey = message.text
+	# Сохраняем полученное значение
+	await state.update_data(WORDKEY=wordkey)
+	await state.set_state(CS.ADD_B2)
+	await bot.send_message(message.chat.id, "✅ Слово ключ - сохранён!")
+	await bot.send_message(message.chat.id, "2️⃣ Введите url для добавления в чёрный список")
+
+@dp.message_handler(state=CS.ADD_B2)
+async def add_B_url(message: types.Message, state:FSMContext):
+	# Извлекаем wordkey
+	data = await state.get_data()
+	wordkey = data.get("WORDKEY")
+	# Получаем url
+	url = message.text
+	bl.create_new_row(wordkey, url)
+	await bot.send_message(message.chat.id, "✅ Исключение добавлено в чёрный список!")
+	await state.set_state(CS.AVAILABLE)
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
