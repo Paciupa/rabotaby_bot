@@ -31,7 +31,7 @@ class CS(StatesGroup):
 	DEL_B = State()
 
 async def is_user_ID(message):
-	return message.from_user.id == config.USER_ID
+	return message.from_user.id == int(user_id)
 
 @dp.message_handler(commands=['start'])  
 async def cmd_start(message: types.Message):
