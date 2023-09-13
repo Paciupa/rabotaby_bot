@@ -115,6 +115,7 @@ async def del_t_input(message: types.Message, state: FSMContext):
 	msg = message.text
 
 	try:
+		# templace - такое слово не существует. Изменить
 		number_templace = int(msg)
 	except ValueError as err:
 		# Если вместо числа принимется команда /print_t, то запускаем функцию print_t, без выполнения остального кода
