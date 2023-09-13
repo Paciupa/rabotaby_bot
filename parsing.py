@@ -1,13 +1,26 @@
 from bs4 import BeautifulSoup
 import requests
+import time
 
-url = "https://rabota.by/search/vacancy?area=1002&enable_snippets=true&ored_clusters=true&text=инженер&search_period=1"
+url = ""
 items_on_page = "&items_on_page=20"
 pages = "&page="
-
-
-# чтобы обойти ошибку 404, добавляю заголовок. Типо я реальный пользователь
+# чтобы обойти ошибку 404, добавляю заголовок. Как будто запрос делает реальный пользователь
 headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'}
+
+# while True:
+for it in range(30):
+
+	time.sleep(10)
+	
+
+
+
+url = "https://rabota.by/search/vacancy?area=1002&enable_snippets=true&ored_clusters=true&text=инженер&search_period=1"
+
+
+
+
 
 number_vacancy = 0
 
@@ -32,6 +45,8 @@ for num_page in range(1000):
 
 			number_vacancy += 1
 
+			# проверяем url по чёрному списку
+			# 
 			print(number_vacancy, name, "-->", url_vacancy)
 	else:
 		break

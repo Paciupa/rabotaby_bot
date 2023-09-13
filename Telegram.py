@@ -4,7 +4,10 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
+# import threading
+
 from Data import SearchTemplates, BlackList, VisitsList
+# global st, bl, vl, telegram_key, user_id, bot, storage, dp
 st = SearchTemplates("SearchTemplates.db")
 bl = BlackList("BlackList.db")
 vl = VisitsList("SearchTemplates.db")
@@ -20,6 +23,7 @@ bot = Bot(token=telegram_key)
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
+
 # Определение класса состояний. 
 class CS(StatesGroup):
 	AVAILABLE = State()
@@ -29,6 +33,10 @@ class CS(StatesGroup):
 	ADD_B2 = State()
 	DEL_T = State()
 	DEL_B = State()
+	SET_TIME = State()
+
+# def run_telegram():
+# 	executor.start_polling(dp, skip_updates=True)
 
 async def is_user_ID(message):
 	return message.from_user.id == int(user_id)
@@ -178,5 +186,31 @@ async def print_b(message: types.Message, state:FSMContext):
 
 	await bot.send_message(message.chat.id, final_msg)
 
+@dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
+async def help(message: types.Message, state:FSMContext):
+	await bot.send_message(message.chat.id, "Введите интервал запросов ")
+	await state.set_state(CS.SET_TIME)
+	
+@dp.message_handler(state=CS.SET_TIME)
+async def add_b_key(message: types.Message, state:FSMContext):
+	delay = int(message.text)
+	if delay > 0 and delay < 60:
+		import Main
+		Main.set_time(delay)
+		await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
+		await state.set_state(CS.AVAILABLE)
+
+
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
+
+	
+# start - Запустить бота 
+# help - Помощь 
+# set_time - Установить задержку запросов
+# add_t - Добавить шаблон поиска
+# del_t - Удалить шаблон поиска
+# print_t - Вывести все шаблоны поиска
+# add_b - Добавить адрес из чёрного списка
+# del_b - Удалить адрес из чёрного списка
+# print_b - Вывести все адреса чёрного списка
