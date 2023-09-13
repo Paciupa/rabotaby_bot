@@ -8,7 +8,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from Data import SearchTemplates, BlackList, VisitsList
-import Main
+# import Main
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
 telegram_key = environ.get('API_TELEGRAM_KEY')
@@ -201,19 +201,21 @@ async def print_b(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, final_msg)
 
 
-@dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
-async def set_request_interval(message: types.Message, state: FSMContext):
-	await bot.send_message(message.chat.id, "Введите интервал запросов ")
-	await state.set_state(CS.SET_TIME)
+# Hереализованная функция
+# @dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
+# async def msg_request_interval(message: types.Message, state: FSMContext):
+# 	await bot.send_message(message.chat.id, "Введите интервал запросов ")
+# 	await state.set_state(CS.SET_TIME)
 
 
-@dp.message_handler(state=CS.SET_TIME)
-async def add_b_key(message: types.Message, state: FSMContext):
-	delay = int(message.text)
-	if 60 > delay > 0:
-		Main.set_time(delay)
-		await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
-		await state.set_state(CS.AVAILABLE)
+# # Hереализованная функция
+# @dp.message_handler(state=CS.SET_TIME)
+# async def set_request_interval(message: types.Message, state: FSMContext):
+# 	delay = int(message.text)
+# 	if 60 > delay > 0:
+# 		Main.set_time(delay)
+# 		await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
+# 		await state.set_state(CS.AVAILABLE)
 
 
 if __name__ == "__main__":
