@@ -4,6 +4,9 @@ import os
 from datetime import datetime
 
 
+# TODO 
+# Почитать ID в базах данных(уникальные значения)
+
 class Base:
 	""" """
 	def __init__(self, name_file):
