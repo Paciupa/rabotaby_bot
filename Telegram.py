@@ -24,7 +24,7 @@ storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
 
-# Определение класса состояний. 
+# Определение класса состояний.
 class CS(StatesGroup):
 	AVAILABLE = State()
 	ADD_T1 = State()
@@ -38,11 +38,13 @@ class CS(StatesGroup):
 # def run_telegram():
 # 	executor.start_polling(dp, skip_updates=True)
 
+
 async def is_user_ID(message):
 	return message.from_user.id == int(user_id)
 
-@dp.message_handler(commands=['start'])  
-async def cmd_start(message: types.Message, state:FSMContext):
+
+@dp.message_handler(commands=['start'])
+async def cmd_start(message: types.Message, state: FSMContext):
 	await asyncio.sleep(0.5)
 	# Только пользователь с допустимым ID сможет получить доступ к боту
 	if await is_user_ID(message):
@@ -53,7 +55,7 @@ async def cmd_start(message: types.Message, state:FSMContext):
 
 
 @dp.message_handler(commands=['help'], state=CS.AVAILABLE)
-async def help(message: types.Message, state:FSMContext):
+async def help(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, """
 	Шаблоны поиска
 	/add_t Добавить шаблон поиска
@@ -66,13 +68,15 @@ async def help(message: types.Message, state:FSMContext):
 	/print_b Вывести все адреса чёрного списка
 	""")
 
+
 @dp.message_handler(commands=['add_t'], state=CS.AVAILABLE)
-async def add_t(message: types.Message, state:FSMContext):
+async def add_t(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, "1️⃣ Введите слово ключ шаблона")
 	await state.set_state(CS.ADD_T1)
 
+
 @dp.message_handler(state=CS.ADD_T1)
-async def add_t_key(message: types.Message, state:FSMContext):
+async def add_t_key(message: types.Message, state: FSMContext):
 	wordkey = message.text
 	# Проверка, на уникальность. Существует ли таке слово ключ в базе шаблонов
 	if wordkey in st.get_col_by_name("key"):
@@ -84,8 +88,9 @@ async def add_t_key(message: types.Message, state:FSMContext):
 		await bot.send_message(message.chat.id, "✅ Слово ключ - сохранён!")
 		await bot.send_message(message.chat.id, "2️⃣ Введите url для добавления в базу")
 
+
 @dp.message_handler(state=CS.ADD_T2)
-async def add_t_url(message: types.Message, state:FSMContext):
+async def add_t_url(message: types.Message, state: FSMContext):
 	# Извлекаем wordkey
 	data = await state.get_data()
 	wordkey = data.get("WORDKEY")
@@ -95,13 +100,15 @@ async def add_t_url(message: types.Message, state:FSMContext):
 	await bot.send_message(message.chat.id, "✅ Новый шаблон добавлен в базу!")
 	await state.set_state(CS.AVAILABLE)
 
+
 @dp.message_handler(commands=['del_t'], state=CS.AVAILABLE)
-async def del_t_msg(message: types.Message, state:FSMContext):
+async def del_t_msg(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, "Укажите номер шаблона.\nЧтобы узнать номер введите /print_t")
 	await state.set_state(CS.DEL_T)
 
+
 @dp.message_handler(state=CS.DEL_T)
-async def del_t_input(message: types.Message, state:FSMContext):
+async def del_t_input(message: types.Message, state: FSMContext):
 	msg = message.text
 	try:
 		number_templece = int(msg)
@@ -116,12 +123,12 @@ async def del_t_input(message: types.Message, state:FSMContext):
 			await print_t(message, state)
 		else:
 			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из списка")
-	
+
 
 @dp.message_handler(commands=['print_t'], state=[
-	CS.AVAILABLE, CS.ADD_T1, CS.ADD_T2, 
+	CS.AVAILABLE, CS.ADD_T1, CS.ADD_T2,
 	CS.ADD_B1, CS.ADD_B2, CS.DEL_T, CS.DEL_B])
-async def print_t(message: types.Message, state:FSMContext):
+async def print_t(message: types.Message, state: FSMContext):
 	final_msg = "Список шаблонов\n\n"
 	for line in st.get_all_table():
 		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
@@ -130,12 +137,13 @@ async def print_t(message: types.Message, state:FSMContext):
 
 
 @dp.message_handler(commands=['add_b'], state=CS.AVAILABLE)
-async def add_b(message: types.Message, state:FSMContext):
+async def add_b(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, "1️⃣ Введите слово ключ для чёрного списка")
 	await state.set_state(CS.ADD_B1)
 
+
 @dp.message_handler(state=CS.ADD_B1)
-async def add_b_key(message: types.Message, state:FSMContext):
+async def add_b_key(message: types.Message, state: FSMContext):
 	wordkey = message.text
 	# Сохраняем полученное значение
 	await state.update_data(WORDKEY=wordkey)
@@ -143,8 +151,9 @@ async def add_b_key(message: types.Message, state:FSMContext):
 	await bot.send_message(message.chat.id, "✅ Слово ключ - сохранён!")
 	await bot.send_message(message.chat.id, "2️⃣ Введите url для добавления в чёрный список")
 
+
 @dp.message_handler(state=CS.ADD_B2)
-async def add_b_url(message: types.Message, state:FSMContext):
+async def add_b_url(message: types.Message, state: FSMContext):
 	# Извлекаем wordkey
 	data = await state.get_data()
 	wordkey = data.get("WORDKEY")
@@ -154,13 +163,15 @@ async def add_b_url(message: types.Message, state:FSMContext):
 	await bot.send_message(message.chat.id, "✅ Исключение добавлено в чёрный список!")
 	await state.set_state(CS.AVAILABLE)
 
+
 @dp.message_handler(commands=['del_b'], state=CS.AVAILABLE)
-async def del_b_msg(message: types.Message, state:FSMContext):
+async def del_b_msg(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, "Укажите номер исключения для удаления.\nЧтобы узнать номер введите /print_b")
 	await state.set_state(CS.DEL_B)
 
+
 @dp.message_handler(state=CS.DEL_B)
-async def del_b_input(message: types.Message, state:FSMContext):
+async def del_b_input(message: types.Message, state: FSMContext):
 	msg = message.text
 	try:
 		number_exception = int(msg)
@@ -175,24 +186,27 @@ async def del_b_input(message: types.Message, state:FSMContext):
 			await print_b(message, state)
 		else:
 			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из чёрного списка")
-	
+
+
 @dp.message_handler(commands=['print_b'], state=[
-	CS.AVAILABLE, CS.ADD_T1, CS.ADD_T2, 
+	CS.AVAILABLE, CS.ADD_T1, CS.ADD_T2,
 	CS.ADD_B1, CS.ADD_B2, CS.DEL_T, CS.DEL_B])
-async def print_b(message: types.Message, state:FSMContext):
+async def print_b(message: types.Message, state: FSMContext):
 	final_msg = "Чёрный список\n\n"
 	for line in bl.get_all_table():
 		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
 
 	await bot.send_message(message.chat.id, final_msg)
 
+
 @dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
-async def help(message: types.Message, state:FSMContext):
+async def help(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, "Введите интервал запросов ")
 	await state.set_state(CS.SET_TIME)
-	
+
+
 @dp.message_handler(state=CS.SET_TIME)
-async def add_b_key(message: types.Message, state:FSMContext):
+async def add_b_key(message: types.Message, state: FSMContext):
 	delay = int(message.text)
 	if delay > 0 and delay < 60:
 		import Main
@@ -204,9 +218,9 @@ async def add_b_key(message: types.Message, state:FSMContext):
 if __name__ == "__main__":
 	executor.start_polling(dp, skip_updates=True)
 
-	
-# start - Запустить бота 
-# help - Помощь 
+
+# start - Запустить бота
+# help - Помощь
 # set_time - Установить задержку запросов
 # add_t - Добавить шаблон поиска
 # del_t - Удалить шаблон поиска

@@ -1,6 +1,7 @@
 import sqlite3
 import threading
 
+
 class Base:
 	""" """
 	def __init__(self, name_file):
@@ -26,26 +27,26 @@ class Base:
 	def __create_new_file_db(self, name_file):
 		# Создаём новый файл с базой, и подключаемся к нему
 		self.__connect(name_file)
-			
+
 		# формируем специальную структуру базы
 		self.cursor.execute(self.create_table_query)
 		self.saving_changes()
 
 	def get_num_all_rows(self, name_table="urls"):
 		# Получаем количество строк в таблице
-		self.cursor.execute(f"SELECT COUNT(*) FROM {name_table}")  
+		self.cursor.execute(f"SELECT COUNT(*) FROM {name_table}")
 		return self.cursor.fetchone()[0]
 
 	# Пока не используется
 	def get_num_all_cols(self, name_table="urls"):
 		# Получаем количество столбцов в таблице
-		self.cursor.execute(f"PRAGMA table_info('{name_table}')") 
+		self.cursor.execute(f"PRAGMA table_info('{name_table}')")
 		return len(self.cursor.fetchall())
-		
+
 	def get_all_table(self, name_table="urls"):
 		self.cursor.execute(f"SELECT * FROM {name_table}")
 		return self.cursor.fetchall()
-	
+
 	def get_col_by_name(self, col_name, name_table="urls"):
 		""" Возвращает весь столбец по имени """
 		self.cursor.execute(f"SELECT {col_name} FROM {name_table}")
@@ -56,6 +57,7 @@ class Base:
 		self.saving_changes()
 		self.cursor.close()
 		self.conn.close()
+
 
 class SearchTemplates(Base):
 	""" """
@@ -88,7 +90,7 @@ class SearchTemplates(Base):
 		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца num.
 		self.cursor.execute(f"SELECT * FROM {name_table} ORDER BY number")
 		rows = self.cursor.fetchall()
-		
+
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
 		# Предположу, что использование вот такого варианта list(range(1, len(self.get_num_all_rows())+1)), забирает чуть больше ресурсов.
 		# Поэтому реализовал без обращения к методу
@@ -100,10 +102,12 @@ class SearchTemplates(Base):
 			self.cursor.execute(f"UPDATE {name_table} SET number = ? WHERE number = ?", (new_number, old_number))
 
 		self.saving_changes()
-	
+
+
 class BlackList(SearchTemplates):
 	""" """
 	pass
+
 
 class VisitsList(Base):
 	""" """

@@ -23,7 +23,7 @@
 
 # delay = 5 # секунды
 
-# # в отдельном потоке запускаем Telegram.py 
+# # в отдельном потоке запускаем Telegram.py
 # def TF():
 # 	Telegram.main()
 
@@ -35,7 +35,7 @@
 
 # import asyncio
 # import threading
-# from Telegram import dp 
+# from Telegram import dp
 # import time
 
 # def run_telegram():
