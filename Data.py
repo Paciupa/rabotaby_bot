@@ -94,11 +94,11 @@ class SearchTemplates(Base):
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
 		# Предположу, что использование вот такого варианта list(range(1, len(self.get_num_all_rows())+1)), забирает чуть больше ресурсов.
 		# Поэтому реализовал без обращения к методу
-		list_new_numbers = list(range(1, len(rows)+1))
+		list_new_numbers = list(range(1, len(rows) + 1))
 		# Обновите столбец 'number' с новыми значениями
 		for new_number in list_new_numbers:
 			# получаем старое значение num в строке, чтобы потом его заменить на новое
-			old_number = rows[new_number-1][0]
+			old_number = rows[new_number - 1][0]
 			self.cursor.execute(f"UPDATE {name_table} SET number = ? WHERE number = ?", (new_number, old_number))
 
 		self.saving_changes()
@@ -125,10 +125,10 @@ class VisitsList(Base):
 		return now.strftime(pattern)
 
 	def create_new_row(self, url, name_table="urls"):
-		dateTime = self.get_current_datetime()
+		current_datetime = self.get_current_datetime()
 		# Создаём новую строку со необходимыми значениями
 		# Так как это список посещений, то при создании новой строки, количество посещений = 1
-		self.cursor.execute(f"INSERT INTO {name_table} VALUES (?, ?, ?)", (dateTime, 1, url))
+		self.cursor.execute(f"INSERT INTO {name_table} VALUES (?, ?, ?)", (current_datetime, 1, url))
 		self.saving_changes()
 
 	def get_visits(self, url, name_table="urls"):
@@ -138,8 +138,8 @@ class VisitsList(Base):
 
 	def update_visits(self, url, name_table="urls"):
 		current_visits = self.get_visits(url)
-		current_dateTime = self.get_current_datetime()
+		current_datetime = self.get_current_datetime()
 		self.cursor.execute(f"UPDATE {name_table} SET visits = ?, dateTime = ? WHERE url = ?",
-			(current_visits + 1, current_dateTime, url))
+			(current_visits + 1, current_datetime, url))
 
 		self.saving_changes()
