@@ -7,10 +7,15 @@ from datetime import datetime
 class Base:
 	""" """
 	def __init__(self, name_file):
+		# !!!!!!!!!!!!!!!!
+		# функция __connect вызывается всегда(и при создании нового файла, и при его наличии)
+		# написать проверку структуры. Если структуры нет(т.е. файл был только что создан), то нужно создать необходимую. А если есть структура, то пропускаем 
+ 		# !!!!!!!!!!!!!!!!
 		# Если файл базы существует, то
 		if self.__check_file_db(name_file):
+			pass
 			# просто подключаемся к нему
-			self.__connect(name_file)
+			# self.__connect(name_file)
 		else:
 			# иначе, создаём его с указанным именем
 			self.__create_new_file_db(name_file)
@@ -27,7 +32,7 @@ class Base:
 
 	def __create_new_file_db(self, name_file):
 		# Создаём новый файл с базой, и подключаемся к нему
-		self.__connect(name_file)
+		# self.__connect(name_file)
 
 		# формируем специальную структуру базы
 		self.cursor.execute(self.create_table_query)
