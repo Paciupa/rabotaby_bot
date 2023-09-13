@@ -57,7 +57,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(commands=['help'], state=CS.AVAILABLE)
-async def help(message: types.Message, state: FSMContext):
+async def command_help(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, """
 	Шаблоны поиска
 	/add_t Добавить шаблон поиска
@@ -202,7 +202,7 @@ async def print_b(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
-async def help(message: types.Message, state: FSMContext):
+async def set_request_interval(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, "Введите интервал запросов ")
 	await state.set_state(CS.SET_TIME)
 
