@@ -116,13 +116,13 @@ async def del_t_input(message: types.Message, state: FSMContext):
 
 	try:
 		number_templace = int(msg)
-	except ValueError as e:
+	except ValueError as err:
 		# Если вместо числа принимется команда /print_t, то запускаем функцию print_t, без выполнения остального кода
 		if msg == "/print_t":
-			await print_t(message, state)
+			await print_t(message)
 		else:
 			# Если полученное число неправильное, то выводится сообщение об ошибке
-			print(e)
+			print(err)
 			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из списка")
 	else:
 		# Если try выполнился, то запускается else (код нижe)
@@ -181,20 +181,27 @@ async def del_b_msg(message: types.Message, state: FSMContext):
 
 @dp.message_handler(state=CS.DEL_B)
 async def del_b_input(message: types.Message, state: FSMContext):
+	""" """
 	msg = message.text
+
 	try:
 		number_exception = int(msg)
+	except ValueError as err:
+		# Если вместо числа принимется команда /print_b, то запускаем функцию print_b, без выполнения остального кода
+		if msg == "/print_b":
+			await print_b(message)
+		else:
+			# Если полученное число неправильное, то выводится сообщение об ошибке
+			print(err)
+			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из чёрного списка")
+	else:
+		# Если try выполнился, то запускается else (код нижe)
 		if bl.get_num_all_rows() >= number_exception > 0:
 			bl.delete_row_by_number(number_exception)
 			await bot.send_message(message.chat.id, "✅ Номер исключения успешно удалён!")
 			await state.set_state(CS.AVAILABLE)
 		else:
 			await bot.send_message(message.chat.id, "❌ Такой номер в чёрном списке отсутсвует. Введите корректный!")
-	except:
-		if msg == "/print_b":
-			await print_b(message, state)
-		else:
-			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из чёрного списка")
 
 
 @dp.message_handler(commands=['print_b'], state=[
