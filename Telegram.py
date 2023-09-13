@@ -113,9 +113,9 @@ async def del_t_msg(message: types.Message, state: FSMContext):
 async def del_t_input(message: types.Message, state: FSMContext):
 	msg = message.text
 	try:
-		number_templece = int(msg)
-		if number_templece > 0 and number_templece <= st.get_num_all_rows():
-			st.delete_row_by_number(number_templece)
+		number_templace = int(msg)
+		if st.get_num_all_rows() >= number_templace > 0:
+			st.delete_row_by_number(number_templace)
 			await bot.send_message(message.chat.id, "✅ Номер шаблона успешно удалён!")
 			await state.set_state(CS.AVAILABLE)
 		else:
@@ -177,7 +177,7 @@ async def del_b_input(message: types.Message, state: FSMContext):
 	msg = message.text
 	try:
 		number_exception = int(msg)
-		if number_exception > 0 and number_exception <= bl.get_num_all_rows():
+		if bl.get_num_all_rows() >= number_exception > 0:
 			bl.delete_row_by_number(number_exception)
 			await bot.send_message(message.chat.id, "✅ Номер исключения успешно удалён!")
 			await state.set_state(CS.AVAILABLE)
@@ -210,7 +210,7 @@ async def set_request_interval(message: types.Message, state: FSMContext):
 @dp.message_handler(state=CS.SET_TIME)
 async def add_b_key(message: types.Message, state: FSMContext):
 	delay = int(message.text)
-	if delay > 0 and delay < 60:
+	if 60 > delay > 0:
 		Main.set_time(delay)
 		await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
 		await state.set_state(CS.AVAILABLE)
