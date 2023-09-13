@@ -56,8 +56,8 @@
 # 		time.sleep(1)
 
 import threading
-from Telegram import run_telegram
 import time
+from Telegram import run_telegram
 
 if __name__ == '__main__':
 	telegram_thread = threading.Thread(target=run_telegram)

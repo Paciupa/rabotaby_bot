@@ -1,5 +1,7 @@
 import sqlite3
 import threading
+import os
+from datetime import datetime
 
 
 class Base:
@@ -14,7 +16,6 @@ class Base:
 			self.__create_new_file_db(name_file)
 
 	def __check_file_db(self, name_file):
-		import os
 		return os.path.isfile(name_file)
 
 	def __connect(self, name_file):
@@ -119,7 +120,6 @@ class VisitsList(Base):
 		"""
 
 	def get_current_datetime(self):
-		from datetime import datetime
 		pattern = "%H:%M:%S %d.%m.%Y"
 		now = datetime.now()
 		return now.strftime(pattern)

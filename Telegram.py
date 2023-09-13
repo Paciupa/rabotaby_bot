@@ -1,23 +1,25 @@
 import asyncio
+from os import environ
+# import threading
+
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-# import threading
-
 from Data import SearchTemplates, BlackList, VisitsList
-# global st, bl, vl, telegram_key, user_id, bot, storage, dp
-st = SearchTemplates("SearchTemplates.db")
-bl = BlackList("BlackList.db")
-vl = VisitsList("SearchTemplates.db")
+import Main
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
-from os import environ
 telegram_key = environ.get('API_TELEGRAM_KEY')
 user_id = environ.get('USER_ID')
 # Подключаемся к боту
 bot = Bot(token=telegram_key)
+
+# global st, bl, vl, telegram_key, user_id, bot, storage, dp
+st = SearchTemplates("SearchTemplates.db")
+bl = BlackList("BlackList.db")
+vl = VisitsList("SearchTemplates.db")
 
 # MemoryStorage. Храним состояния в оператиной памяти. Заменить на другой тип хранения
 storage = MemoryStorage()
@@ -209,7 +211,6 @@ async def help(message: types.Message, state: FSMContext):
 async def add_b_key(message: types.Message, state: FSMContext):
 	delay = int(message.text)
 	if delay > 0 and delay < 60:
-		import Main
 		Main.set_time(delay)
 		await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
 		await state.set_state(CS.AVAILABLE)
