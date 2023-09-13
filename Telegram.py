@@ -57,7 +57,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(commands=['help'], state=CS.AVAILABLE)
-async def command_help(message: types.Message, state: FSMContext):
+async def command_help(message: types.Message):
 	await bot.send_message(message.chat.id, """
 	Шаблоны поиска
 	/add_t Добавить шаблон поиска
@@ -130,7 +130,7 @@ async def del_t_input(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=['print_t'], state=[
 	CS.AVAILABLE, CS.ADD_T1, CS.ADD_T2,
 	CS.ADD_B1, CS.ADD_B2, CS.DEL_T, CS.DEL_B])
-async def print_t(message: types.Message, state: FSMContext):
+async def print_t(message: types.Message):
 	final_msg = "Список шаблонов\n\n"
 	for line in st.get_all_table():
 		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
@@ -193,7 +193,7 @@ async def del_b_input(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=['print_b'], state=[
 	CS.AVAILABLE, CS.ADD_T1, CS.ADD_T2,
 	CS.ADD_B1, CS.ADD_B2, CS.DEL_T, CS.DEL_B])
-async def print_b(message: types.Message, state: FSMContext):
+async def print_b(message: types.Message):
 	final_msg = "Чёрный список\n\n"
 	for line in bl.get_all_table():
 		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
