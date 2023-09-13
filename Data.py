@@ -144,6 +144,8 @@ class VisitsList(Base):
 	def update_visits(self, url, name_table="urls"):
 		current_visits = self.get_visits(url)
 		current_datetime = self.get_current_datetime()
+		# Переделать названия для столбцов
+		# КоличествоПосещений, Время/Дата последнего посещения, url
 		self.cursor.execute(f"UPDATE {name_table} SET visits = ?, dateTime = ? WHERE url = ?",
 			(current_visits + 1, current_datetime, url))
 
