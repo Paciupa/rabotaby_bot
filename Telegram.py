@@ -21,7 +21,7 @@ st = SearchTemplates("SearchTemplates.db")
 bl = BlackList("BlackList.db")
 vl = VisitsList("SearchTemplates.db")
 
-# MemoryStorage. Храним состояния в оператиной памяти. Заменить на другой тип хранения
+# MemoryStorage. Храним состояния в оперативной памяти. Заменить на другой тип хранения
 storage = MemoryStorage()
 dp = Dispatcher(bot, storage=storage)
 
@@ -88,7 +88,7 @@ async def add_t_key(message: types.Message, state: FSMContext):
 		await state.update_data(WORDKEY=wordkey)
 		await state.set_state(CS.ADD_T2)
 		await bot.send_message(message.chat.id, "✅ Слово ключ - сохранён!")
-		await bot.send_message(message.chat.id, "2️⃣ Введите url для добавления в базу")
+		await bot.send_message(message.chat.id, "2️⃣ Введите URL для добавления в базу")
 
 
 @dp.message_handler(state=CS.ADD_T2)
@@ -96,7 +96,7 @@ async def add_t_url(message: types.Message, state: FSMContext):
 	# Извлекаем wordkey
 	data = await state.get_data()
 	wordkey = data.get("WORDKEY")
-	# Получаем url
+	# Получаем URL
 	url = message.text
 	st.create_new_row(wordkey, url)
 	await bot.send_message(message.chat.id, "✅ Новый шаблон добавлен в базу!")
@@ -118,7 +118,7 @@ async def del_t_input(message: types.Message, state: FSMContext):
 		# templace - такое слово не существует. Изменить
 		number_templace = int(msg)
 	except ValueError as err:
-		# Если вместо числа принимется команда /print_t, то запускаем функцию print_t, без выполнения остального кода
+		# Если вместо числа принимается команда /print_t, то запускаем функцию print_t, без выполнения остального кода
 		if msg == "/print_t":
 			await print_t(message)
 		else:
@@ -126,13 +126,13 @@ async def del_t_input(message: types.Message, state: FSMContext):
 			print(err)
 			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из списка")
 	else:
-		# Если try выполнился, то запускается else (код нижe)
+		# Если try выполнился, то запускается else (код ниже)
 		if st.get_num_all_rows() >= number_templace > 0:
 			st.delete_row_by_number(number_templace)
 			await bot.send_message(message.chat.id, "✅ Номер шаблона успешно удалён!")
 			await state.set_state(CS.AVAILABLE)
 		else:
-			await bot.send_message(message.chat.id, "❌ Такой номер в базе отсутсвует. Введите корректный!")
+			await bot.send_message(message.chat.id, "❌ Такой номер в базе отсутствует. Введите корректный!")
 
 
 @dp.message_handler(commands=['print_t'], state=[
@@ -159,7 +159,7 @@ async def add_b_key(message: types.Message, state: FSMContext):
 	await state.update_data(WORDKEY=wordkey)
 	await state.set_state(CS.ADD_B2)
 	await bot.send_message(message.chat.id, "✅ Слово ключ - сохранён!")
-	await bot.send_message(message.chat.id, "2️⃣ Введите url для добавления в чёрный список")
+	await bot.send_message(message.chat.id, "2️⃣ Введите URL для добавления в чёрный список")
 
 
 @dp.message_handler(state=CS.ADD_B2)
@@ -188,7 +188,7 @@ async def del_b_input(message: types.Message, state: FSMContext):
 	try:
 		number_exception = int(msg)
 	except ValueError as err:
-		# Если вместо числа принимется команда /print_b, то запускаем функцию print_b, без выполнения остального кода
+		# Если вместо числа принимается команда /print_b, то запускаем функцию print_b, без выполнения остального кода
 		if msg == "/print_b":
 			await print_b(message)
 		else:
@@ -196,13 +196,13 @@ async def del_b_input(message: types.Message, state: FSMContext):
 			print(err)
 			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из чёрного списка")
 	else:
-		# Если try выполнился, то запускается else (код нижe)
+		# Если try выполнился, то запускается else (код ниже)
 		if bl.get_num_all_rows() >= number_exception > 0:
 			bl.delete_row_by_number(number_exception)
 			await bot.send_message(message.chat.id, "✅ Номер исключения успешно удалён!")
 			await state.set_state(CS.AVAILABLE)
 		else:
-			await bot.send_message(message.chat.id, "❌ Такой номер в чёрном списке отсутсвует. Введите корректный!")
+			await bot.send_message(message.chat.id, "❌ Такой номер в чёрном списке отсутствует. Введите корректный!")
 
 
 @dp.message_handler(commands=['print_b'], state=[
@@ -216,14 +216,14 @@ async def print_b(message: types.Message):
 	await bot.send_message(message.chat.id, final_msg)
 
 
-# Hереализованная функция
+# Нереализованная функция
 # @dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
 # async def msg_request_interval(message: types.Message, state: FSMContext):
 # 	await bot.send_message(message.chat.id, "Введите интервал запросов ")
 # 	await state.set_state(CS.SET_TIME)
 
 
-# # Hереализованная функция
+# # Нереализованная функция
 # @dp.message_handler(state=CS.SET_TIME)
 # async def set_request_interval(message: types.Message, state: FSMContext):
 # 	delay = int(message.text)
