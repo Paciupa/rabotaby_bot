@@ -1,0 +1,11 @@
+[Main]
+disable =
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    empty-docstring,
+    line-too-long,
+    import-error,
+
+[Format]
+indent-string = \t
