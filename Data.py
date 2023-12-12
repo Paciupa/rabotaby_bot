@@ -153,3 +153,37 @@ class VisitsList(Base):
 			(current_visits + 1, current_datetime, url))
 
 		self.saving_changes()
+
+
+
+list_names_tables = {
+	"ST": "SearchTemplates",
+	"BL": "BlackList",
+	"VL": "VisitsList"
+}
+
+header = "CREATE TABLE IF NOT EXISTS "
+
+list_of_columns = {
+	"number": "number INTEGER NOT NULL",
+	"key": "key TEXT NOT NULL",
+	"url": "url TEXT NOT NULL",
+	"lastDateTime": "lastDateTime TEXT NOT NULL",
+	"numberVisits": "numberVisits INTEGER NOT NULL"
+}
+
+def get_configured_query(table_code):
+	base = header + list_names_tables[table_code]
+	# Сокращаем имя, чтобы запись была компакнее
+	lc = list_of_columns
+	if table_code == "ST" or table_code == "BL":
+		query = f"{base} ({lc['number']}, {lc['key']}, {lc['url']});"
+	elif table_code == "VL":
+		query = f"{base} ({lc['lastDateTime']}, {lc['numberVisits']}, {lc['url']});"
+
+	return query
+
+print(get_configured_query("ST"))
+print(get_configured_query("BL"))
+print(get_configured_query("VL"))
+
