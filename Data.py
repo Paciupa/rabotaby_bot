@@ -8,6 +8,59 @@ from datetime import datetime
 # Почитать ID в базах данных (уникальные значения)
 
 class Base:
+class Settings:
+	""" Example:
+		print(Settings.get_query("BL"))
+		Settings.set_name_database("database")
+		print(Settings.get_name_database())
+	"""
+
+	__name_database = "base"
+
+	__list_names_tables = {
+		"ST": "SearchTemplates",
+		"BL": "BlackList",
+		"VL": "VisitsList"
+	}
+
+	__header = "CREATE TABLE IF NOT EXISTS "
+
+	__list_of_columns = {
+		"number": "number INTEGER NOT NULL",
+		"key": "key TEXT NOT NULL",
+		"url": "url TEXT NOT NULL",
+		"lastDateTime": "lastDateTime DATETIME NOT NULL",
+		"numberVisits": "numberVisits INTEGER NOT NULL"
+	}
+
+	@staticmethod
+	def get_name_database():
+		return __class__.__name_database
+
+	@staticmethod
+	def set_name_database(new_name):
+		__class__.__name_database = new_name
+
+	@staticmethod
+	def get_list_codes_tables():
+		return list(__class__.__list_names_tables.keys())
+
+	@staticmethod
+	def get_query(table_code):
+		# Проверяем. Содержится ли указанный код в списке имён таблиц
+		if table_code in __class__.get_list_codes_tables():
+			# формируем полную шапку запроса
+			full_header = __class__.__header + __class__.__list_names_tables[table_code]
+			# Сокращаем имя, чтобы запись была компакнее
+			lc = __class__.__list_of_columns
+			if table_code == "ST" or table_code == "BL":
+				query = f"{full_header} ({lc['number']}, {lc['key']}, {lc['url']});"
+			elif table_code == "VL":
+				query = f"{full_header} ({lc['lastDateTime']}, {lc['numberVisits']}, {lc['url']});"
+
+			return query
+		else:
+			print(f"Некорректный код => {table_code}. Введите один из этих {list(__class__.__list_names_tables.keys())}")
 	""" """
 	def __init__(self, name_file):
 		# !!!!!!!!!!!!!!!!
@@ -154,36 +207,4 @@ class VisitsList(Base):
 
 		self.saving_changes()
 
-
-
-list_names_tables = {
-	"ST": "SearchTemplates",
-	"BL": "BlackList",
-	"VL": "VisitsList"
-}
-
-header = "CREATE TABLE IF NOT EXISTS "
-
-list_of_columns = {
-	"number": "number INTEGER NOT NULL",
-	"key": "key TEXT NOT NULL",
-	"url": "url TEXT NOT NULL",
-	"lastDateTime": "lastDateTime TEXT NOT NULL",
-	"numberVisits": "numberVisits INTEGER NOT NULL"
-}
-
-def get_configured_query(table_code):
-	base = header + list_names_tables[table_code]
-	# Сокращаем имя, чтобы запись была компакнее
-	lc = list_of_columns
-	if table_code == "ST" or table_code == "BL":
-		query = f"{base} ({lc['number']}, {lc['key']}, {lc['url']});"
-	elif table_code == "VL":
-		query = f"{base} ({lc['lastDateTime']}, {lc['numberVisits']}, {lc['url']});"
-
-	return query
-
-print(get_configured_query("ST"))
-print(get_configured_query("BL"))
-print(get_configured_query("VL"))
 
