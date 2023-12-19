@@ -19,34 +19,49 @@ class Settings:
 
 	__name_database = "base"
 
-	__list_names_tables = {
-		"ST": "SearchTemplates",
-		"BL": "BlackList",
-		"VL": "VisitsList"
-	}
+	__number = ("number", "INTEGER NOT NULL")
+	__key = ("key", "TEXT NOT NULL")
+	__url = ("url", "TEXT NOT NULL")
+	__lastDateTime = ("lastDateTime", "DATETIME NOT NULL")
+	__numberVisits = ("numberVisits", "INTEGER NOT NULL")
 
 	__header = "CREATE TABLE IF NOT EXISTS "
 
-	__list_of_columns = {
-		"number": "number INTEGER NOT NULL",
-		"key": "key TEXT NOT NULL",
-		"url": "url TEXT NOT NULL",
-		"lastDateTime": "lastDateTime DATETIME NOT NULL",
-		"numberVisits": "numberVisits INTEGER NOT NULL"
+	__database_structure = {
+		"ST": {
+			"name_table" : "SearchTemplates",
+			"column_1" : __number,
+			"column_2" : __key,
+			"column_3" : __url
+			},
+		"BL": {
+			"name_table" : "BlackList",
+			"column_1" : __number,
+			"column_2" : __key,
+			"column_3" : __url
+			},
+		"VL": {
+			"name_table" : "VisitsList",
+			"column_1" : __lastDateTime,
+			"column_2" : __numberVisits,
+			"column_3" : __url
+			}
 	}
 
 	@staticmethod
 	def get_name_database():
+		"""Получить имя файла базы данных"""
 		return __class__.__name_database
 
 	@staticmethod
 	def set_name_database(new_name):
+		"""Установть новое имя для файла базы данных"""
 		__class__.__name_database = new_name
 
 	@staticmethod
 	def get_list_codes_tables():
 		"""Получить список всех кодов для имён таблиц """
-		return list(__class__.__list_names_tables.keys())
+		return list(__class__.__database_structure.keys())
 
 	@staticmethod
 	def __check_table_code(func):
@@ -60,21 +75,36 @@ class Settings:
 
 	@__check_table_code
 	@staticmethod
+	def __get_setting_for_parameter(code_table):
+		# Так как "name_table" в списке ключей не нужен, используем срез [1::]
+		list_keys_columns = list(__class__.__database_structure[code_table].keys())[1::]
+		for key_column in list_keys_columns:
+			# Получаем по ключу_столбца кортеж(имя и настройки). Потом собираем в строку с помощью " ".join
+			# Пример вывода одной иттерации: "numberVisits INTEGER NOT NULL"
+			yield " ".join(__class__.__database_structure[code_table][key_column])
+
+	@__check_table_code
+	@staticmethod
 	def get_table_name_by_code(table_code):
-		return __class__.__list_names_tables[table_code]
+		"""Получить имя таблицы по коду"""
+		return __class__.__database_structure[table_code]['name_table']
 
 	@__check_table_code
 	@staticmethod
 	def get_query(table_code):
 		""" """
-		# формируем полную шапку запроса
-		full_header = __class__.__header + __class__.__list_names_tables[table_code]
-		# Сокращаем имя, чтобы запись была компакнее
-		lc = __class__.__list_of_columns
-		if table_code == "ST" or table_code == "BL":
-			query = f"{full_header} ({lc['number']}, {lc['key']}, {lc['url']});"
-		elif table_code == "VL":
-			query = f"{full_header} ({lc['lastDateTime']}, {lc['numberVisits']}, {lc['url']});"
+		# Формируем полную шапку запроса
+		full_header = __class__.__header + __class__.get_table_name_by_code(table_code)
+		
+		## Получаем список всех параметров для запроса
+		# Количество параметров для запроса = количество столбцов для каждой таблицы = количество запросов yield
+		list_all_parameters = list(i for i in __class__.__get_setting_for_parameter(table_code))
+
+		## Создаём запрос
+		# Отделяем параметры запятыми и помещаем в скобки
+		# Пример результата: 
+		# "CREATE TABLE IF NOT EXISTS BlackList (number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL)"
+		query = f"{full_header} ({', '.join(list_all_parameters)})"
 
 		return query
 
