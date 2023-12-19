@@ -11,6 +11,8 @@ class Base:
 class Settings:
 	""" Example:
 		print(Settings.get_query("BL"))
+		print(Settings.get_table_name_by_code("gf"))
+		print(Settings.get_name_database())
 		Settings.set_name_database("database")
 		print(Settings.get_name_database())
 	"""
@@ -43,24 +45,40 @@ class Settings:
 
 	@staticmethod
 	def get_list_codes_tables():
+		"""Получить список всех кодов для имён таблиц """
 		return list(__class__.__list_names_tables.keys())
 
 	@staticmethod
-	def get_query(table_code):
-		# Проверяем. Содержится ли указанный код в списке имён таблиц
-		if table_code in __class__.get_list_codes_tables():
-			# формируем полную шапку запроса
-			full_header = __class__.__header + __class__.__list_names_tables[table_code]
-			# Сокращаем имя, чтобы запись была компакнее
-			lc = __class__.__list_of_columns
-			if table_code == "ST" or table_code == "BL":
-				query = f"{full_header} ({lc['number']}, {lc['key']}, {lc['url']});"
-			elif table_code == "VL":
-				query = f"{full_header} ({lc['lastDateTime']}, {lc['numberVisits']}, {lc['url']});"
+	def __check_table_code(func):
+		def wrapper(table_code, *args):
+			"""Проверяем, содержится ли введённый код в списке имён таблиц"""
+			if table_code in __class__.get_list_codes_tables():
+				return func(table_code, *args)
+			else:
+				print(f"Некорректный код => {table_code}. Введите один из доступных => {__class__.get_list_codes_tables()}")
+		return wrapper
 
-			return query
-		else:
-			print(f"Некорректный код => {table_code}. Введите один из этих {list(__class__.__list_names_tables.keys())}")
+	@__check_table_code
+	@staticmethod
+	def get_table_name_by_code(table_code):
+		return __class__.__list_names_tables[table_code]
+
+	@__check_table_code
+	@staticmethod
+	def get_query(table_code):
+		""" """
+		# формируем полную шапку запроса
+		full_header = __class__.__header + __class__.__list_names_tables[table_code]
+		# Сокращаем имя, чтобы запись была компакнее
+		lc = __class__.__list_of_columns
+		if table_code == "ST" or table_code == "BL":
+			query = f"{full_header} ({lc['number']}, {lc['key']}, {lc['url']});"
+		elif table_code == "VL":
+			query = f"{full_header} ({lc['lastDateTime']}, {lc['numberVisits']}, {lc['url']});"
+
+		return query
+
+
 	""" """
 	def __init__(self, name_file):
 		# !!!!!!!!!!!!!!!!
