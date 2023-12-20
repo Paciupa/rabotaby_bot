@@ -141,7 +141,7 @@ async def del_t_input(message: types.Message, state: FSMContext):
 	CS.ADD_B1, CS.ADD_B2, CS.DEL_T, CS.DEL_B])
 async def print_t(message: types.Message):
 	final_msg = "Список шаблонов\n\n"
-	for line in st.get_all_table():
+	for line in st.get_all_from_table():
 		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
 
 	await bot.send_message(message.chat.id, final_msg)
@@ -211,7 +211,7 @@ async def del_b_input(message: types.Message, state: FSMContext):
 	CS.ADD_B1, CS.ADD_B2, CS.DEL_T, CS.DEL_B])
 async def print_b(message: types.Message):
 	final_msg = "Чёрный список\n\n"
-	for line in bl.get_all_table():
+	for line in bl.get_all_from_table():
 		final_msg += f"{line[0]}. {line[1]} - {line[2]}\n"
 
 	await bot.send_message(message.chat.id, final_msg)
