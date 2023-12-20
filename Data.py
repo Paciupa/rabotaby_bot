@@ -64,6 +64,21 @@ class Settings:
 		return list(__class__.__database_structure.keys())
 
 	@staticmethod
+	def is_column_present(name_column):
+		"""Проверяет, существует ли указанный столбец в таблицах"""
+		# Извлекаем из текущего класса, все переменные (пары ключ-значения). И оставляем только кортежи
+		tuple_used_names = tuple(value for key, value in vars(__class__).items() if isinstance(value, tuple))
+		# Извлекаем из кортежей имена таблиц, и записываем в список
+		list_all_names_collums = list([name for name, _ in tuple_used_names])
+		
+		# TODO исправить этот костыль
+		if name_column in list_all_names_collums:
+			# передаём дальше значение, если всё хорошо
+			return name_column
+		else:
+			print(f"Некорретное имя стобца => {name_column}. Введите один из доступных => {list_all_names_collums}")
+
+	@staticmethod
 	def __check_table_code(func):
 		def wrapper(table_code, *args):
 			"""Проверяем, содержится ли введённый код в списке имён таблиц"""
