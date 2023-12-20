@@ -7,7 +7,6 @@ from datetime import datetime
 # TODO
 # Почитать ID в базах данных (уникальные значения)
 
-class Base:
 class Settings:
 	""" Example:
 		print(Settings.get_query("BL"))
@@ -15,10 +14,12 @@ class Settings:
 		print(Settings.get_name_database())
 		Settings.set_name_database("database")
 		print(Settings.get_name_database())
+		print(Settings.is_column_present("BL"))
 	"""
 
 	__name_database = "base"
 
+	# Тип хранения значений(кортеж), не изменять. По нему происходит поиск названия столбцов 
 	__number = ("number", "INTEGER NOT NULL")
 	__key = ("key", "TEXT NOT NULL")
 	__url = ("url", "TEXT NOT NULL")
@@ -107,7 +108,7 @@ class Settings:
 	@__check_table_code
 	@staticmethod
 	def get_query(table_code):
-		""" """
+		"""Получить запрос для создания таблицы"""
 		# Формируем полную шапку запроса
 		full_header = __class__.__header + __class__.get_table_name_by_code(table_code)
 		
@@ -123,60 +124,77 @@ class Settings:
 
 		return query
 
-
+class Base():
 	""" """
-	def __init__(self, name_file):
-		# !!!!!!!!!!!!!!!!
-		# функция __connect вызывается всегда(и при создании нового файла, и при его наличии)
-		# написать проверку структуры. Если структуры нет(т.е. файл был только что создан), то нужно создать необходимую. А если есть структура, то пропускаем
-		# !!!!!!!!!!!!!!!!
+	def __init__(self):
+		self.name_database = Settings.get_name_database()
+		# Формируем полное имя с расширением
+		self.full_name_database = f"{self.name_database}.db"
+
 		# Если файл базы существует, то
-		if self.__check_file_db(name_file):
-			pass
+		if self.__check_file_db():
 			# просто подключаемся к нему
-			# self.__connect(name_file)
+			self.__connect()
 		else:
-			# иначе, создаём его с указанным именем
-			self.__create_new_file_db(name_file)
+			# иначе, создаём его с указанным именем и базовыми таблицами
+			self.__create_new_file_db()
 
-	def __check_file_db(self, name_file):
-		return os.path.isfile(name_file)
+		# Можно заметить что метод self.__connect вызвается вне зависимости от выполения условия.
+		# Да, так и есть. Если разместить метод self.__connect пред условием self.__check_file_db, то выяснить, есть ли внутри файла необходимые таблицы, гораздо сложнее, чем при текущей проверке.
+		# Поэтому оставляем такой вариант реализации
 
-	def __connect(self, name_file):
-		self.conn = sqlite3.connect(name_file)
+	def __check_file_db(self):
+		return os.path.isfile(self.name_database)
+
+	def __connect(self):
+		self.conn = sqlite3.connect(self.full_name_database)
 		self.cursor = self.conn.cursor()
 
 	def saving_changes(self):
 		self.conn.commit()
 
-	def __create_new_file_db(self, name_file):
+	def __create_new_file_db(self):
 		# Создаём новый файл с базой, и подключаемся к нему
-		# self.__connect(name_file)
+		self.__connect()
 
-		# формируем специальную структуру базы
-		self.cursor.execute(self.create_table_query)
-		self.saving_changes()
+		# Для каждой таблицы, формируем персональный запрос
+		for code_table in Settings.get_list_codes_tables():
+			# Создаём таблицу
+			self.cursor.execute(Settings.get_query(code_table))
+			self.saving_changes()
 
-	def get_num_all_rows(self, name_table="urls"):
+	def get_num_all_rows(self, code_name_table: str):
+		""" """
+		name_table = Settings.get_table_name_by_code(code_name_table)
 		# Получаем количество строк в таблице
 		self.cursor.execute(f"SELECT COUNT(*) FROM {name_table}")
 		return self.cursor.fetchone()[0]
 
-	# Пока не используется
-	def get_num_all_cols(self, name_table="urls"):
-		# Получаем количество столбцов в таблице
-		self.cursor.execute(f"PRAGMA table_info('{name_table}')")
-		return len(self.cursor.fetchall())
-
-	def get_all_table(self, name_table="urls"):
+	def get_all_from_table(self, code_name_table: str):
+		"""Получить все данные таблицы"""
+		name_table = Settings.get_table_name_by_code(code_name_table)
 		self.cursor.execute(f"SELECT * FROM {name_table}")
 		return self.cursor.fetchall()
 
-	def get_col_by_name(self, col_name, name_table="urls"):
-		""" Возвращает весь столбец по имени """
+	def get_col_by_name(self, col_name, code_name_table: str):
+		"""Возвращает весь столбец по имени"""
+		name_table = Settings.get_table_name_by_code(code_name_table)
 		self.cursor.execute(f"SELECT {col_name} FROM {name_table}")
 		raw_list_of_keys = self.cursor.fetchall()
 		return [key[0] for key in raw_list_of_keys]
+
+	def create_new_row(self, name_table, *args):
+		"""Создаём новую строку со необходимыми значениями"""
+		# Формируем параметры запроса. Пример результата -> (?, ?, ?)
+		questions = "?" * len(args)
+		query_parameters = f"({', '.join(questions)})"
+
+		# Формируем сам запрос
+		query = f"INSERT INTO {name_table} VALUES {query_parameters}"
+
+		# Создаём новую строку
+		self.cursor.execute(query, args)
+		self.saving_changes()
 
 	def close(self):
 		self.saving_changes()
@@ -186,34 +204,30 @@ class Settings:
 
 class SearchTemplates(Base):
 	""" """
-	create_table_query = """
-		CREATE TABLE IF NOT EXISTS urls (
-			number INTEGER NOT NULL,
-			key TEXT NOT NULL,
-			url TEXT NOT NULL);
-		"""
+	__name_table = Settings.get_table_name_by_code("ST")
+	# Пред записью в переменную класса, проверяем существует ли такое имя
+	__number = Settings.is_column_present("number")
 
-	def create_new_row(self, new_key, new_url, name_table="urls"):
+	def create_new_row(self, new_key, new_url):
 		number_rows = self.get_num_all_rows()
 		# Создаём номер новой строки
 		next_number = number_rows + 1
 		# Создаём новую строку со необходимыми значениями
-		self.cursor.execute(f"INSERT INTO {name_table} VALUES (?, ?, ?)", (next_number, new_key, new_url))
+		super().create_new_row(__class__.__name_table, next_number, new_key, new_url)
+
+	def delete_row_by_number(self, number):
+		"""Удаляем строку по номеру"""
+		self.cursor.execute(f"DELETE FROM {__class__.__name_table} WHERE {__class__.__number}=?", (number,))
+
 		self.saving_changes()
 
-	def delete_row_by_number(self, number, name_table="urls"):
-		""" Удаляем строку по номеру """
-		self.cursor.execute(f"DELETE FROM {name_table} WHERE number=?", (number,))
+		# обновляем нумерацию в столбце number. Так как при удалении появился разрыв в нумерации
+		self.__update_col_number()
 
-		self.saving_changes()
-
-		# обновляем нумерацию в столбце num. Так как при удалении появился разрыв в нумерации
-		self.__update_col_num()
-
-	def __update_col_num(self, name_table="urls"):
-		""" Обновляем числа в столбце num """
-		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца num.
-		self.cursor.execute(f"SELECT * FROM {name_table} ORDER BY number")
+	def __update_col_number(self):
+		"""Обновляем числа в столбце c числами"""
+		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца number.
+		self.cursor.execute(f"SELECT * FROM {__class__.__name_table} ORDER BY {__class__.__number}")
 		rows = self.cursor.fetchall()
 
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
@@ -222,52 +236,60 @@ class SearchTemplates(Base):
 		list_new_numbers = list(range(1, len(rows) + 1))
 		# Обновите столбец 'number' с новыми значениями
 		for new_number in list_new_numbers:
-			# получаем старое значение num в строке, чтобы потом его заменить на новое
+			# Получаем старое значение number в строке, чтобы потом его заменить на новое
 			old_number = rows[new_number - 1][0]
-			self.cursor.execute(f"UPDATE {name_table} SET number = ? WHERE number = ?", (new_number, old_number))
+			self.cursor.execute(
+				f"UPDATE {__class__.__name_table} SET {__class__.__number} = ? WHERE {__class__.__number} = ?",
+				(new_number, old_number),
+			)
 
 		self.saving_changes()
 
 
 class BlackList(SearchTemplates):
 	""" """
-	pass
+	__name_table = Settings.get_table_name_by_code("BL")
 
 
 class VisitsList(Base):
 	""" """
-	create_table_query = """
-		CREATE TABLE IF NOT EXISTS urls (
-			dateTime TEXT NOT NULL,
-			visits INTEGER NOT NULL,
-			url TEXT NOT NULL);
-		"""
+	__name_table = Settings.get_table_name_by_code("VL")
+	# Пред записью в переменную класса, проверяем существует ли такое имя
+	__url = Settings.is_column_present("url")
+	__numberVisits = Settings.is_column_present("numberVisits")
+	__lastDateTime = Settings.is_column_present("lastDateTime")
 
 	def get_current_datetime(self):
 		pattern = "%H:%M:%S %d.%m.%Y"
 		now = datetime.now()
 		return now.strftime(pattern)
 
-	def create_new_row(self, url, name_table="urls"):
+	def create_new_row(self, url):
 		current_datetime = self.get_current_datetime()
 		# Создаём новую строку со необходимыми значениями
 		# Так как это список посещений, то при создании новой строки, количество посещений = 1
-		self.cursor.execute(f"INSERT INTO {name_table} VALUES (?, ?, ?)", (current_datetime, 1, url))
-		self.saving_changes()
-
-	def get_visits(self, url, name_table="urls"):
+		super().create_new_row(__class__.__name_table, current_datetime, 1, url)
+	
+	def get_visits(self, url):
 		# Получаем количество посещений по адресу
-		self.cursor.execute(f"SELECT visits FROM {name_table} WHERE url=?", (url,))
+		self.cursor.execute(
+			f"SELECT {__class__.__numberVisits} FROM {__class__.__name_table} WHERE {__class__.__url}=?", (url,)
+		)
 		return self.cursor.fetchone()[0]
 
-	def update_visits(self, url, name_table="urls"):
+	def update_visits(self, url):
 		current_visits = self.get_visits(url)
 		current_datetime = self.get_current_datetime()
-		# Переделать названия для столбцов
+		
+		# Сокращаем длинные имена, для более удобного восприятия строки
+		name_table = __class__.name_table
+		numberVisits = __class__.__numberVisits
+		lastDateTime = __class__.__lastDateTime
+
 		# КоличествоПосещений, Время/Дата последнего посещения, url
-		self.cursor.execute(f"UPDATE {name_table} SET visits = ?, dateTime = ? WHERE url = ?",
-			(current_visits + 1, current_datetime, url))
+		self.cursor.execute(
+			f"UPDATE {name_table} SET {numberVisits} = ?, {lastDateTime} = ? WHERE {__class__.__url} = ?",
+			(current_visits + 1, current_datetime, url),
+		)
 
 		self.saving_changes()
-
-
