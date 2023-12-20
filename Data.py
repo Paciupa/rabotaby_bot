@@ -163,22 +163,22 @@ class Base():
 			self.cursor.execute(Settings.get_query(code_table))
 			self.saving_changes()
 
-	def get_num_all_rows(self, code_name_table: str):
+	def get_num_all_rows(self):
 		""" """
-		name_table = Settings.get_table_name_by_code(code_name_table)
+		name_table = self.__class__.name_table
 		# Получаем количество строк в таблице
 		self.cursor.execute(f"SELECT COUNT(*) FROM {name_table}")
 		return self.cursor.fetchone()[0]
 
-	def get_all_from_table(self, code_name_table: str):
+	def get_all_from_table(self):
 		"""Получить все данные таблицы"""
-		name_table = Settings.get_table_name_by_code(code_name_table)
+		name_table = self.__class__.name_table
 		self.cursor.execute(f"SELECT * FROM {name_table}")
 		return self.cursor.fetchall()
 
-	def get_col_by_name(self, col_name, code_name_table: str):
+	def get_col_by_name(self, col_name):
 		"""Возвращает весь столбец по имени"""
-		name_table = Settings.get_table_name_by_code(code_name_table)
+		name_table = self.__class__.name_table
 		self.cursor.execute(f"SELECT {col_name} FROM {name_table}")
 		raw_list_of_keys = self.cursor.fetchall()
 		return [key[0] for key in raw_list_of_keys]
@@ -204,7 +204,8 @@ class Base():
 
 class SearchTemplates(Base):
 	""" """
-	__name_table = Settings.get_table_name_by_code("ST")
+	# Не приватная переменная, так как к ней нужен доступ из суперкласса
+	name_table = Settings.get_table_name_by_code("ST")
 	# Пред записью в переменную класса, проверяем существует ли такое имя
 	__number = Settings.is_column_present("number")
 
@@ -213,11 +214,11 @@ class SearchTemplates(Base):
 		# Создаём номер новой строки
 		next_number = number_rows + 1
 		# Создаём новую строку со необходимыми значениями
-		super().create_new_row(__class__.__name_table, next_number, new_key, new_url)
+		super().create_new_row(self.__class__.name_table, next_number, new_key, new_url)
 
 	def delete_row_by_number(self, number):
 		"""Удаляем строку по номеру"""
-		self.cursor.execute(f"DELETE FROM {__class__.__name_table} WHERE {__class__.__number}=?", (number,))
+		self.cursor.execute(f"DELETE FROM {self.__class__.name_table} WHERE {__class__.__number}=?", (number,))
 
 		self.saving_changes()
 
@@ -227,7 +228,7 @@ class SearchTemplates(Base):
 	def __update_col_number(self):
 		"""Обновляем числа в столбце c числами"""
 		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца number.
-		self.cursor.execute(f"SELECT * FROM {__class__.__name_table} ORDER BY {__class__.__number}")
+		self.cursor.execute(f"SELECT * FROM {self.__class__.name_table} ORDER BY {__class__.__number}")
 		rows = self.cursor.fetchall()
 
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
@@ -239,7 +240,7 @@ class SearchTemplates(Base):
 			# Получаем старое значение number в строке, чтобы потом его заменить на новое
 			old_number = rows[new_number - 1][0]
 			self.cursor.execute(
-				f"UPDATE {__class__.__name_table} SET {__class__.__number} = ? WHERE {__class__.__number} = ?",
+				f"UPDATE {self.__class__.name_table} SET {__class__.__number} = ? WHERE {__class__.__number} = ?",
 				(new_number, old_number),
 			)
 
@@ -248,12 +249,14 @@ class SearchTemplates(Base):
 
 class BlackList(SearchTemplates):
 	""" """
-	__name_table = Settings.get_table_name_by_code("BL")
+	# Не приватная переменная, так как к ней нужен доступ из суперкласса
+	name_table = Settings.get_table_name_by_code("BL")
 
 
 class VisitsList(Base):
 	""" """
-	__name_table = Settings.get_table_name_by_code("VL")
+	# Не приватная переменная, так как к ней нужен доступ из суперкласса
+	name_table = Settings.get_table_name_by_code("VL")
 	# Пред записью в переменную класса, проверяем существует ли такое имя
 	__url = Settings.is_column_present("url")
 	__numberVisits = Settings.is_column_present("numberVisits")
@@ -268,12 +271,12 @@ class VisitsList(Base):
 		current_datetime = self.get_current_datetime()
 		# Создаём новую строку со необходимыми значениями
 		# Так как это список посещений, то при создании новой строки, количество посещений = 1
-		super().create_new_row(__class__.__name_table, current_datetime, 1, url)
+		super().create_new_row(__class__.name_table, current_datetime, 1, url)
 	
 	def get_visits(self, url):
 		# Получаем количество посещений по адресу
 		self.cursor.execute(
-			f"SELECT {__class__.__numberVisits} FROM {__class__.__name_table} WHERE {__class__.__url}=?", (url,)
+			f"SELECT {__class__.__numberVisits} FROM {__class__.name_table} WHERE {__class__.__url}=?", (url,)
 		)
 		return self.cursor.fetchone()[0]
 
