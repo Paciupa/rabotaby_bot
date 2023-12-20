@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-from Data import SearchTemplates, BlackList, VisitsList
+from Data import Base, SearchTemplates, BlackList, VisitsList
 # import Main
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
@@ -17,9 +17,10 @@ user_id = environ.get('USER_ID')
 bot = Bot(token=telegram_key)
 
 # global st, bl, vl, telegram_key, user_id, bot, storage, dp
-st = SearchTemplates("SearchTemplates.db")
-bl = BlackList("BlackList.db")
-vl = VisitsList("SearchTemplates.db")
+Base()
+st = SearchTemplates()
+bl = BlackList()
+vl = VisitsList()
 
 # MemoryStorage. Храним состояния в оперативной памяти. Заменить на другой тип хранения
 storage = MemoryStorage()
