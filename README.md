@@ -11,7 +11,7 @@ It runs locally on the computer.
 	export API_TELEGRAM_KEY
 
 	USER_ID="121212121"
-	export USER_I
+	export USER_ID
 ```
 где вместо `12121212...` нужно вставить свои значения
 3. Сохранить
