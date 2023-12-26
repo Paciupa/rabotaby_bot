@@ -290,19 +290,41 @@ class BlackList(SearchTemplates):
 	""" """
 
 	def __init__(self):
-		# Пред записью в переменную экземпляра, проверяем существует ли такое имя
-		self.name_table = Settings.get_table_name_by_code("BL")
+		super().__init__()
+		self.table_code = "BL"
+		self.name_table = Settings.get_table_name_by_code(self.table_code)
+		self.number = Settings.is_column_present("number")
+		
+		# Если базы данных не существует, то создаём её
+		self.database_exists()
+
+		# Если указанной таблицы не существует, то создаём её
+		self.table_exists(self.table_code)
+		
+		self.connection = psycopg2.connect(**self.all_parameters)
+		self.cursor = self.connection.cursor()
 
 
 class VisitsList(Base):
 	""" """
 
 	def __init__(self):
-		# Пред записью в переменную экземпляра, проверяем существует ли такое имя
-		self.name_table = Settings.get_table_name_by_code("VL")
-		self.__url = Settings.is_column_present("url")
-		self.__numberVisits = Settings.is_column_present("numberVisits")
-		self.__lastDateTime = Settings.is_column_present("lastDateTime")
+		super().__init__()
+		self.table_code = "VL"
+		self.name_table = Settings.get_table_name_by_code(self.table_code)
+		self.number = Settings.is_column_present("number")
+		self.url = Settings.is_column_present("url")
+		self.numberVisits = Settings.is_column_present("numberVisits")
+		self.lastDateTime = Settings.is_column_present("lastDateTime")
+		
+		# Если базы данных не существует, то создаём её
+		self.database_exists()
+
+		# Если указанной таблицы не существует, то создаём её
+		self.table_exists(self.table_code)
+		
+		self.connection = psycopg2.connect(**self.all_parameters)
+		self.cursor = self.connection.cursor()
 
 	def get_current_datetime(self):
 		pattern = "%H:%M:%S %d.%m.%Y"
@@ -318,7 +340,7 @@ class VisitsList(Base):
 	def get_visits(self, url):
 		# Получаем количество посещений по адресу
 		self.cursor.execute(
-			f"SELECT {self.__numberVisits} FROM {self.name_table} WHERE {self.__url}=%s", (url,)
+			f"SELECT {self.numberVisits} FROM {self.name_table} WHERE {self.url}=%s", (url,)
 		)
 		return self.cursor.fetchone()[0]
 
@@ -328,7 +350,7 @@ class VisitsList(Base):
 
 		# КоличествоПосещений, Время/Дата последнего посещения, url
 		self.cursor.execute(
-			f"UPDATE {self.name_table} SET {self.__numberVisits} = %s, {self.lastDateTime} = %s WHERE {self.__url} = %s",
+			f"UPDATE {self.name_table} SET {self.numberVisits} = %s, {self.lastDateTime} = %s WHERE {self.url} = %s",
 			(current_visits + 1, current_datetime, url),
 		)
 
