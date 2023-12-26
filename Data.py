@@ -70,37 +70,37 @@ class Settings:
 			}
 	}
 
-	@staticmethod
-	def get_name_database():
+	@classmethod
+	def get_name_database(cls):
 		"""Получить имя файла базы данных"""
-		return __class__.__db_name
+		return cls.__db_name
 
-	@staticmethod
-	def get_db_connection_parameters(without_database=False):
+	@classmethod
+	def get_db_connection_parameters(cls, without_database=False):
 		"""	Получить словарь с параметрами для создания/подключения базы данных
 
 			Если without_database=True, то словарь вернётся без параметра db_name
 		"""
 		if without_database:
 			# Создаём копию, чтобы не модифицировать основной словарь
-			copy_db_conn_param = __class__.__db_connection_parameters.copy()
+			copy_db_conn_param = cls.__db_connection_parameters.copy()
 			# Удаляем лишнее
 			del copy_db_conn_param["database"]
 			# Возвращаем копию
 			return copy_db_conn_param
 
-		return __class__.__db_connection_parameters
+		return cls.__db_connection_parameters
 
-	@staticmethod
-	def get_list_codes_tables():
+	@classmethod
+	def get_list_codes_tables(cls):
 		"""Получить список всех кодов для имён таблиц """
-		return list(__class__.__database_structure.keys())
+		return list(cls.__database_structure.keys())
 
-	@staticmethod
-	def is_column_present(name_column):
+	@classmethod
+	def is_column_present(cls, name_column):
 		"""Проверяет, существует ли указанный столбец в таблицах"""
 		# Извлекаем из текущего класса, все переменные (пары ключ-значения). И оставляем только кортежи
-		tuple_used_names = tuple(value for key, value in vars(__class__).items() if isinstance(value, tuple))
+		tuple_used_names = tuple(value for key, value in vars(cls).items() if isinstance(value, tuple))
 		# Извлекаем из кортежей имена таблиц, и записываем в список
 		list_all_names_collums = list([name for name, _ in tuple_used_names])
 		
@@ -111,42 +111,42 @@ class Settings:
 		else:
 			print(f"Некорретное имя стобца => {name_column}. Введите один из доступных => {list_all_names_collums}")
 
-	@staticmethod
-	def __check_table_code(func):
+	@classmethod
+	def __check_table_code(cls, func):
 		def wrapper(table_code, *args):
 			"""Проверяем, содержится ли введённый код в списке имён таблиц"""
-			if table_code in __class__.get_list_codes_tables():
+			if table_code in cls.get_list_codes_tables():
 				return func(table_code, *args)
 			else:
-				print(f"Некорректный код => {table_code}. Введите один из доступных => {__class__.get_list_codes_tables()}")
+				print(f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}")
 		return wrapper
 
 	@__check_table_code
-	@staticmethod
-	def __get_setting_for_parameter(code_table):
+	@classmethod
+	def __get_setting_for_parameter(cls, code_table):
 		# Так как "name_table" в списке ключей не нужен, используем срез [1::]
-		list_keys_columns = list(__class__.__database_structure[code_table].keys())[1::]
+		list_keys_columns = list(cls.__database_structure[code_table].keys())[1::]
 		for key_column in list_keys_columns:
 			# Получаем по ключу_столбца кортеж(имя и настройки). Потом собираем в строку с помощью " ".join
 			# Пример вывода одной иттерации: "numberVisits INTEGER NOT NULL"
-			yield " ".join(__class__.__database_structure[code_table][key_column])
+			yield " ".join(cls.__database_structure[code_table][key_column])
 
 	@__check_table_code
-	@staticmethod
-	def get_table_name_by_code(table_code):
+	@classmethod
+	def get_table_name_by_code(cls, table_code):
 		"""Получить имя таблицы по коду"""
-		return __class__.__database_structure[table_code]['name_table']
+		return cls.__database_structure[table_code]['name_table']
 
 	@__check_table_code
-	@staticmethod
-	def get_query(table_code):
+	@classmethod
+	def get_query(cls, table_code):
 		"""Получить запрос для создания таблицы"""
 		# Формируем полную шапку запроса
-		full_header = __class__.__header + __class__.get_table_name_by_code(table_code)
+		full_header = cls.__header + cls.get_table_name_by_code(table_code)
 		
 		## Получаем список всех параметров для запроса
 		# Количество параметров для запроса = количество столбцов для каждой таблицы = количество запросов yield
-		list_all_parameters = list(i for i in __class__.__get_setting_for_parameter(table_code))
+		list_all_parameters = list(i for i in cls.__get_setting_for_parameter(table_code))
 
 		## Создаём запрос
 		# Отделяем параметры запятыми и помещаем в скобки
@@ -218,21 +218,18 @@ class Base():
 
 	def get_num_all_rows(self):
 		""" """
-		name_table = self.__class__.name_table
 		# Получаем количество строк в таблице
-		self.cursor.execute(f"SELECT COUNT(*) FROM {name_table}")
+		self.cursor.execute(f"SELECT COUNT(*) FROM {self.__name_table}")
 		return self.cursor.fetchone()[0]
 
 	def get_all_from_table(self):
 		"""Получить все данные таблицы"""
-		name_table = self.__class__.name_table
-		self.cursor.execute(f"SELECT * FROM {name_table}")
+		self.cursor.execute(f"SELECT * FROM {self.__name_table}")
 		return self.cursor.fetchall()
 
 	def get_col_by_name(self, col_name):
 		"""Возвращает весь столбец по имени"""
-		name_table = self.__class__.name_table
-		self.cursor.execute(f"SELECT {col_name} FROM {name_table}")
+		self.cursor.execute(f"SELECT {col_name} FROM {self.__name_table}")
 		raw_list_of_keys = self.cursor.fetchall()
 		return [key[0] for key in raw_list_of_keys]
 
@@ -257,21 +254,22 @@ class Base():
 
 class SearchTemplates(Base):
 	""" """
-	# Не приватная переменная, так как к ней нужен доступ из суперкласса
-	name_table = Settings.get_table_name_by_code("ST")
-	# Пред записью в переменную класса, проверяем существует ли такое имя
-	__number = Settings.is_column_present("number")
+
+	def __init__(self):
+		# Пред записью в переменную экземпляра, проверяем существует ли такое имя
+		self.__name_table = Settings.get_table_name_by_code("ST")
+		self.__number = Settings.is_column_present("number")
 
 	def create_new_row(self, new_key, new_url):
 		number_rows = self.get_num_all_rows()
 		# Создаём номер новой строки
 		next_number = number_rows + 1
 		# Создаём новую строку со необходимыми значениями
-		super().create_new_row(self.__class__.name_table, next_number, new_key, new_url)
+		super().create_new_row(self.__name_table, next_number, new_key, new_url)
 
 	def delete_row_by_number(self, number):
 		"""Удаляем строку по номеру"""
-		self.cursor.execute(f"DELETE FROM {self.__class__.name_table} WHERE {__class__.__number}=?", (number,))
+		self.cursor.execute(f"DELETE FROM {self.__name_table} WHERE {self.__number}=?", (number,))
 
 		self.saving_changes()
 
@@ -281,7 +279,7 @@ class SearchTemplates(Base):
 	def __update_col_number(self):
 		"""Обновляем числа в столбце c числами"""
 		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца number.
-		self.cursor.execute(f"SELECT * FROM {self.__class__.name_table} ORDER BY {__class__.__number}")
+		self.cursor.execute(f"SELECT * FROM {self.__name_table} ORDER BY {self.__number}")
 		rows = self.cursor.fetchall()
 
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
@@ -293,7 +291,7 @@ class SearchTemplates(Base):
 			# Получаем старое значение number в строке, чтобы потом его заменить на новое
 			old_number = rows[new_number - 1][0]
 			self.cursor.execute(
-				f"UPDATE {self.__class__.name_table} SET {__class__.__number} = ? WHERE {__class__.__number} = ?",
+				f"UPDATE {self.__name_table} SET {self.__number} = ? WHERE {self.__number} = ?",
 				(new_number, old_number),
 			)
 
@@ -302,18 +300,21 @@ class SearchTemplates(Base):
 
 class BlackList(SearchTemplates):
 	""" """
-	# Не приватная переменная, так как к ней нужен доступ из суперкласса
-	name_table = Settings.get_table_name_by_code("BL")
+
+	def __init__(self):
+		# Пред записью в переменную экземпляра, проверяем существует ли такое имя
+		self.__name_table = Settings.get_table_name_by_code("BL")
 
 
 class VisitsList(Base):
 	""" """
-	# Не приватная переменная, так как к ней нужен доступ из суперкласса
-	name_table = Settings.get_table_name_by_code("VL")
-	# Пред записью в переменную класса, проверяем существует ли такое имя
-	__url = Settings.is_column_present("url")
-	__numberVisits = Settings.is_column_present("numberVisits")
-	__lastDateTime = Settings.is_column_present("lastDateTime")
+
+	def __init__(self):
+		# Пред записью в переменную экземпляра, проверяем существует ли такое имя
+		self.__name_table = Settings.get_table_name_by_code("VL")
+		self.__url = Settings.is_column_present("url")
+		self.__numberVisits = Settings.is_column_present("numberVisits")
+		self.__lastDateTime = Settings.is_column_present("lastDateTime")
 
 	def get_current_datetime(self):
 		pattern = "%H:%M:%S %d.%m.%Y"
@@ -324,27 +325,22 @@ class VisitsList(Base):
 		current_datetime = self.get_current_datetime()
 		# Создаём новую строку со необходимыми значениями
 		# Так как это список посещений, то при создании новой строки, количество посещений = 1
-		super().create_new_row(__class__.name_table, current_datetime, 1, url)
+		super().create_new_row(self.__name_table, current_datetime, 1, url)
 	
 	def get_visits(self, url):
 		# Получаем количество посещений по адресу
 		self.cursor.execute(
-			f"SELECT {__class__.__numberVisits} FROM {__class__.name_table} WHERE {__class__.__url}=?", (url,)
+			f"SELECT {self.__numberVisits} FROM {self.__name_table} WHERE {self.__url}=?", (url,)
 		)
 		return self.cursor.fetchone()[0]
 
 	def update_visits(self, url):
 		current_visits = self.get_visits(url)
 		current_datetime = self.get_current_datetime()
-		
-		# Сокращаем длинные имена, для более удобного восприятия строки
-		name_table = __class__.name_table
-		numberVisits = __class__.__numberVisits
-		lastDateTime = __class__.__lastDateTime
 
 		# КоличествоПосещений, Время/Дата последнего посещения, url
 		self.cursor.execute(
-			f"UPDATE {name_table} SET {numberVisits} = ?, {lastDateTime} = ? WHERE {__class__.__url} = ?",
+			f"UPDATE {self.__name_table} SET {self.__numberVisits} = ?, {self.lastDateTime} = ? WHERE {self.__url} = ?",
 			(current_visits + 1, current_datetime, url),
 		)
 
