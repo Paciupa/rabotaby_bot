@@ -44,7 +44,7 @@ class Settings:
 	__number = ("number", "INTEGER NOT NULL")
 	__key = ("key", "TEXT NOT NULL")
 	__url = ("url", "TEXT NOT NULL")
-	__lastDateTime = ("lastDateTime", "DATETIME NOT NULL")
+	__lastDateTime = ("lastDateTime", "TIMESTAMP NOT NULL")
 	__numberVisits = ("numberVisits", "INTEGER NOT NULL")
 
 	__header = "CREATE TABLE IF NOT EXISTS "
