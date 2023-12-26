@@ -168,55 +168,7 @@ class Base():
 	def saving_changes(self):
 		self.connection.commit()
 
-	# def connect(self):
-	# 	try:
-	# 		# Подключение к PostgreSQL
-	# 		self.connection = psycopg2.connect(**self.parameters_without_database)
-				
-	# 		# Проверка существования базы данных
-	# 		if self.check_database_existence():
-
-	# 			print(f"База данных '{self.db_name}' уже существует. Подключение...")
-	# 			self.connection = psycopg2.connect(**self.all_parameters)
-	# 			self.cursor = self.connection.cursor()
-
-	# 			# print("Вывести все данные из таблицы!!!")
-	# 			# self.print_data()
-	# 		else:
-	# 			# Создание базы данных, если её нет
-	# 			self.create_database()
-
-	# 			# После создания базы данных переподключаемся
-	# 			self.connection.close()
-	# 			self.connection = psycopg2.connect(**self.all_parameters)
-	# 			print(f"Успешное подключение к базе данных '{self.db_name}'.")
-	# 	except Exception as e:
-	# 		# Обработка общих ошибок подключения
-	# 		print(f"Ошибка при подключении к базе данных: {e}")
-	# 	# finally:
-	# 	# 	if self.connection:
-	# 	# 		self.connection.close()
-
-	# def check_database_existence(self):
-	# 	"""Проверка существования базы данных."""
-	# 	# Подключение к PostgreSQL
-	# 	self.connection = psycopg2.connect(**self.parameters_without_database)
-	# 	self.cursor = self.connection.cursor()
-	# 	try:
-	# 		self.connection.set_session(autocommit=True)
-
-	# 		sql_query = sql.SQL("SELECT 1 FROM pg_database WHERE datname = %s;")
-	# 		self.cursor.execute(sql_query, (self.db_name,))
-	# 		result = self.cursor.fetchone()
-	# 		return bool(result)
-	# 	except Exception as e:
-	# 		# Обработка ошибок (например, отсутствие прав на выполнение запроса)
-	# 		print(f"Ошибка при проверке существования базы данных: {e}")
-	# 		return False
-	# 	finally:
-	# 		self.cursor.close()
-
-	def create_database(self):
+	def database_exists(self):
 		"""Создание новой базы данных"""
 		self.connection = psycopg2.connect(**self.parameters_without_database)
 		self.cursor = self.connection.cursor()
@@ -234,46 +186,28 @@ class Base():
 		finally:
 			self.cursor.close()
 
-	def create_table(self, table_code):
+	def table_exists(self, table_code):
 		# Формируем таблицу по указанному коду
 		self.connection = psycopg2.connect(**self.all_parameters)
 		self.cursor = self.connection.cursor()
 		self.cursor.execute(Settings.get_query(table_code))
 		self.saving_changes()
 
-	# def check_table_existence(self, table_name):
-	# 	"""Проверка существования таблицы в базе данных."""
-	# 	self.connection = psycopg2.connect(**self.all_parameters)
-	# 	self.cursor = self.connection.cursor()
-	# 	try:
-	# 		self.connection.set_session(autocommit=True)
-
-	# 		sql_query = sql.SQL("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = %s);")
-	# 		self.cursor.execute(sql_query, (table_name,))
-	# 		result = self.cursor.fetchone()
-	# 		return bool(result[0])
-	# 	except Exception as e:
-	# 		# Обработка ошибок (например, отсутствие прав на выполнение запроса)
-	# 		print(f"Ошибка при проверке существования таблицы: {e}")
-	# 		return False
-		# finally:
-		# 	self.cursor.close()
-
 	def get_num_all_rows(self):
 		""" """
 		# Получаем количество строк в таблице
-		self.cursor.execute(f"SELECT COUNT(*) FROM {self.__name_table}")
+		self.cursor.execute(f"SELECT COUNT(*) FROM {self.name_table}")
 		return self.cursor.fetchone()[0]
 
 	def get_all_from_table(self):
 		"""Получить все данные таблицы"""
-		print(self.__name_table)
-		self.cursor.execute(f"SELECT * FROM {self.__name_table}")
+		print(self.name_table)
+		self.cursor.execute(f"SELECT * FROM {self.name_table}")
 		return self.cursor.fetchall()
 
 	def get_col_by_name(self, col_name):
 		"""Возвращает весь столбец по имени"""
-		self.cursor.execute(f"SELECT {col_name} FROM {self.__name_table}")
+		self.cursor.execute(f"SELECT {col_name} FROM {self.name_table}")
 		raw_list_of_keys = self.cursor.fetchall()
 		return [key[0] for key in raw_list_of_keys]
 
@@ -300,31 +234,26 @@ class SearchTemplates(Base):
 
 	def __init__(self):
 		super().__init__()
-		self.__table_code = "ST"
-		self.__name_table = Settings.get_table_name_by_code(self.__table_code)
-		self.__number = Settings.is_column_present("number")
+		self.table_code = "ST"
+		self.name_table = Settings.get_table_name_by_code(self.table_code)
+		self.number = Settings.is_column_present("number")
 		
-		# if not self.check_database_existence():
-		# print("Если базы нет, то создаём")
-		self.create_database()
-		# print("ST База уже существует!")
+		# Если базы данных не существует, то создаём её
+		self.database_exists()
 
-		# if not self.check_table_existence(self.__name_table):
-		# 	print("ST Таблица отсутствует, создаём")
-		self.create_table(self.__table_code)
+		# Если указанной таблицы не существует, то создаём её
+		self.table_exists(self.table_code)
 		
-
 		self.connection = psycopg2.connect(**self.all_parameters)
 		self.cursor = self.connection.cursor()
-		print(f"База данных '{self.db_name}' уже существует. Подключение...")
+		# print(f"База данных '{self.db_name}' уже существует. Подключение...")
 		
-
 	def create_new_row(self, new_key, new_url):
 		number_rows = self.get_num_all_rows()
 		# Создаём номер новой строки
 		next_number = number_rows + 1
 		# Создаём новую строку со необходимыми значениями
-		super().create_new_row(self.__name_table, next_number, new_key, new_url)
+		super().create_new_row(self.name_table, next_number, new_key, new_url)
 
 	def delete_row_by_number(self, number):
 		"""Удаляем строку по номеру"""
@@ -338,7 +267,7 @@ class SearchTemplates(Base):
 	def __update_col_number(self):
 		"""Обновляем числа в столбце c числами"""
 		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца number.
-		self.cursor.execute(f"SELECT * FROM {self.__name_table} ORDER BY {self.__number}")
+		self.cursor.execute(f"SELECT * FROM {self.name_table} ORDER BY {self.number}")
 		rows = self.cursor.fetchall()
 
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
@@ -362,7 +291,7 @@ class BlackList(SearchTemplates):
 
 	def __init__(self):
 		# Пред записью в переменную экземпляра, проверяем существует ли такое имя
-		self.__name_table = Settings.get_table_name_by_code("BL")
+		self.name_table = Settings.get_table_name_by_code("BL")
 
 
 class VisitsList(Base):
@@ -370,7 +299,7 @@ class VisitsList(Base):
 
 	def __init__(self):
 		# Пред записью в переменную экземпляра, проверяем существует ли такое имя
-		self.__name_table = Settings.get_table_name_by_code("VL")
+		self.name_table = Settings.get_table_name_by_code("VL")
 		self.__url = Settings.is_column_present("url")
 		self.__numberVisits = Settings.is_column_present("numberVisits")
 		self.__lastDateTime = Settings.is_column_present("lastDateTime")
@@ -384,7 +313,7 @@ class VisitsList(Base):
 		current_datetime = self.get_current_datetime()
 		# Создаём новую строку со необходимыми значениями
 		# Так как это список посещений, то при создании новой строки, количество посещений = 1
-		super().create_new_row(self.__name_table, current_datetime, 1, url)
+		super().create_new_row(self.name_table, current_datetime, 1, url)
 	
 	def get_visits(self, url):
 		# Получаем количество посещений по адресу
@@ -404,15 +333,3 @@ class VisitsList(Base):
 		)
 
 		self.saving_changes()
-
-
-
-# создание таблицы
-# self.create_table()
-# print("Создана таблица!")
-
-# # Вставка данных в таблицу
-# self.add_new_row("Lole", 25)
-# self.add_new_row("Xerlic", -4)
-# self.add_new_row("optimus", 154)
-# print("Данные записаны")
