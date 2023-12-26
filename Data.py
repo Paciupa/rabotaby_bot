@@ -279,9 +279,9 @@ class Base():
 
 	def create_new_row(self, name_table, *args):
 		"""Создаём новую строку со необходимыми значениями"""
-		# Формируем параметры запроса. Пример результата -> (?, ?, ?)
-		questions = "?" * len(args)
-		query_parameters = f"({', '.join(questions)})"
+		# Формируем параметры запроса. Пример результата -> ('%s', '%s', '%s')
+		placeholders = ["%s"] * len(args)
+		query_parameters = f"({', '.join(placeholders)})"
 
 		# Формируем сам запрос
 		query = f"INSERT INTO {name_table} VALUES {query_parameters}"
@@ -328,7 +328,7 @@ class SearchTemplates(Base):
 
 	def delete_row_by_number(self, number):
 		"""Удаляем строку по номеру"""
-		self.cursor.execute(f"DELETE FROM {self.__name_table} WHERE {self.__number}=?", (number,))
+		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {self.number}=%s", (number,))
 
 		self.saving_changes()
 
@@ -350,7 +350,7 @@ class SearchTemplates(Base):
 			# Получаем старое значение number в строке, чтобы потом его заменить на новое
 			old_number = rows[new_number - 1][0]
 			self.cursor.execute(
-				f"UPDATE {self.__name_table} SET {self.__number} = ? WHERE {self.__number} = ?",
+				f"UPDATE {self.name_table} SET {self.number} = %s WHERE {self.number} = %s",
 				(new_number, old_number),
 			)
 
@@ -389,7 +389,7 @@ class VisitsList(Base):
 	def get_visits(self, url):
 		# Получаем количество посещений по адресу
 		self.cursor.execute(
-			f"SELECT {self.__numberVisits} FROM {self.__name_table} WHERE {self.__url}=?", (url,)
+			f"SELECT {self.__numberVisits} FROM {self.name_table} WHERE {self.__url}=%s", (url,)
 		)
 		return self.cursor.fetchone()[0]
 
@@ -399,7 +399,7 @@ class VisitsList(Base):
 
 		# КоличествоПосещений, Время/Дата последнего посещения, url
 		self.cursor.execute(
-			f"UPDATE {self.__name_table} SET {self.__numberVisits} = ?, {self.lastDateTime} = ? WHERE {self.__url} = ?",
+			f"UPDATE {self.name_table} SET {self.__numberVisits} = %s, {self.lastDateTime} = %s WHERE {self.__url} = %s",
 			(current_visits + 1, current_datetime, url),
 		)
 
