@@ -1,6 +1,8 @@
 import sqlite3
 # import threading
-import os
+import psycopg2
+from psycopg2 import sql
+from os import environ, path
 from datetime import datetime
 
 
@@ -15,10 +17,29 @@ class Settings:
 		Settings.set_name_database("database")
 		print(Settings.get_name_database())
 		print(Settings.is_column_present("BL"))
+
+		print(Settings.get_db_connection_parameters())
+		print(Settings.get_db_connection_parameters(True))
+		print(Settings.get_db_connection_parameters())
 	"""
 
-	__name_database = "base"
+	## Подключение к базе данных
+	# Достаём из переменных окружения все необходимые параметры для базы данных
+	__db_host = environ.get('DB_HOST')
+	__db_port = environ.get('DB_PORT')
+	__db_name = environ.get('DB_NAME')
+	__db_user = environ.get('DB_USER')
+	__db_password = environ.get('DB_PASSWORD')
 
+	__db_connection_parameters = {
+		"host" : __db_host,
+		"port" : __db_port,
+		"database" : __db_name,
+		"user" : __db_user,
+		"password" : __db_password
+	}
+
+	## Формирование базы данных
 	# Тип хранения значений(кортеж), не изменять. По нему происходит поиск названия столбцов 
 	__number = ("number", "INTEGER NOT NULL")
 	__key = ("key", "TEXT NOT NULL")
@@ -52,12 +73,23 @@ class Settings:
 	@staticmethod
 	def get_name_database():
 		"""Получить имя файла базы данных"""
-		return __class__.__name_database
+		return __class__.__db_name
 
 	@staticmethod
-	def set_name_database(new_name):
-		"""Установть новое имя для файла базы данных"""
-		__class__.__name_database = new_name
+	def get_db_connection_parameters(without_database=False):
+		"""	Получить словарь с параметрами для создания/подключения базы данных
+
+			Если without_database=True, то словарь вернётся без параметра db_name
+		"""
+		if without_database:
+			# Создаём копию, чтобы не модифицировать основной словарь
+			copy_db_conn_param = __class__.__db_connection_parameters.copy()
+			# Удаляем лишнее
+			del copy_db_conn_param["database"]
+			# Возвращаем копию
+			return copy_db_conn_param
+
+		return __class__.__db_connection_parameters
 
 	@staticmethod
 	def get_list_codes_tables():
@@ -124,27 +156,47 @@ class Settings:
 
 		return query
 
+
 class Base():
 	""" """
 	def __init__(self):
-		self.name_database = Settings.get_name_database()
+		self.db_name = Settings.get_name_database()
 		# Формируем полное имя с расширением
-		self.full_name_database = f"{self.name_database}.db"
+		# self.full_name_database = f"{self.db_name}.db"
 
-		# Если файл базы существует, то
-		if self.__check_file_db():
-			# просто подключаемся к нему
-			self.__connect()
+		if self.__check_db():
+			# Если существует, то просто подключаемся
+			self.conn = psycopg2.connect(**Settings.get_db_connection_parameters())
+			self.cursor = self.conn.cursor()
 		else:
-			# иначе, создаём его с указанным именем и базовыми таблицами
-			self.__create_new_file_db()
+			self.conn = psycopg2.connect(**Settings.get_db_connection_parameters(without_database=True))
+			# Установка автокоммита для создания базы данных
+			self.conn.autocommit = True
+			# Создание объекта курсора
+			self.cursor = self.conn.cursor()
 
-		# Можно заметить что метод self.__connect вызвается вне зависимости от выполения условия.
-		# Да, так и есть. Если разместить метод self.__connect пред условием self.__check_file_db, то выяснить, есть ли внутри файла необходимые таблицы, гораздо сложнее, чем при текущей проверке.
-		# Поэтому оставляем такой вариант реализации
+			# Формируем запрос, чтобы создать базу данных с указанным именем
+			create_db_query = sql.SQL("CREATE DATABASE {}").format(sql.Identifier(self.db_name))
+			# Создаём
+			self.cursor.execute(create_db_query)
 
-	def __check_file_db(self):
-		return os.path.isfile(self.name_database)
+
+	def __check_db(self):
+		cursor = conn.cursor()
+		
+		try:
+			# Попытка выполнить запрос к базе данных
+			sql_query = sql.SQL("SELECT 1 FROM pg_database WHERE datname = %s;")
+			cursor.execute(sql_query, (database_name,))
+			result = cursor.fetchone()
+			return bool(result)
+		except Exception as e:
+			# Обработка ошибок (например, отсутствие прав на выполнение запроса)
+			print(f"Ошибка при проверке существования базы данных: {e}")
+			return False
+		finally:
+			cursor.close()
+			return os.path.isfile(self.db_name)
 
 	def __connect(self):
 		self.conn = sqlite3.connect(self.full_name_database)
@@ -162,6 +214,7 @@ class Base():
 			# Создаём таблицу
 			self.cursor.execute(Settings.get_query(code_table))
 			self.saving_changes()
+
 
 	def get_num_all_rows(self):
 		""" """
