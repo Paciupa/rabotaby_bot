@@ -17,10 +17,11 @@ user_id = environ.get('USER_ID')
 bot = Bot(token=telegram_key)
 
 # global st, bl, vl, telegram_key, user_id, bot, storage, dp
-Base()
+# a = Base()
+# a.connect()
 st = SearchTemplates()
-bl = BlackList()
-vl = VisitsList()
+bl = "BlackList()"
+vl = "VisitsList()"
 
 # MemoryStorage. Храним состояния в оперативной памяти. Заменить на другой тип хранения
 storage = MemoryStorage()

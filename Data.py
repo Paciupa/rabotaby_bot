@@ -1,8 +1,7 @@
-import sqlite3
 # import threading
 import psycopg2
 from psycopg2 import sql
-from os import environ, path
+from os import environ
 from datetime import datetime
 
 
@@ -112,38 +111,39 @@ class Settings:
 			print(f"Некорретное имя стобца => {name_column}. Введите один из доступных => {list_all_names_collums}")
 
 	@classmethod
-	def __check_table_code(cls, func):
-		def wrapper(table_code, *args):
-			"""Проверяем, содержится ли введённый код в списке имён таблиц"""
-			if table_code in cls.get_list_codes_tables():
-				return func(table_code, *args)
-			else:
-				print(f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}")
-		return wrapper
+	def __check_table_code(cls, table_code):
+		"""Проверяем, содержится ли введённый код в списке имён таблиц"""
+		try:
+			# Делаем тестовый запрос
+			_ = cls.__database_structure[table_code]
+			# Если такой табличный код существует, то возвращаем его для дальнейших взаимодействий 
+			return table_code
+		except KeyError:
+			print(f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}")
 
-	@__check_table_code
 	@classmethod
-	def __get_setting_for_parameter(cls, code_table):
+	def __get_setting_for_parameter(cls, table_code):
+		table_code = cls.__check_table_code(table_code)
 		# Так как "name_table" в списке ключей не нужен, используем срез [1::]
-		list_keys_columns = list(cls.__database_structure[code_table].keys())[1::]
+		list_keys_columns = list(cls.__database_structure[table_code].keys())[1::]
 		for key_column in list_keys_columns:
 			# Получаем по ключу_столбца кортеж(имя и настройки). Потом собираем в строку с помощью " ".join
 			# Пример вывода одной иттерации: "numberVisits INTEGER NOT NULL"
-			yield " ".join(cls.__database_structure[code_table][key_column])
+			yield " ".join(cls.__database_structure[table_code][key_column])
 
-	@__check_table_code
 	@classmethod
 	def get_table_name_by_code(cls, table_code):
 		"""Получить имя таблицы по коду"""
+		table_code = cls.__check_table_code(table_code)
 		return cls.__database_structure[table_code]['name_table']
 
-	@__check_table_code
 	@classmethod
 	def get_query(cls, table_code):
 		"""Получить запрос для создания таблицы"""
+		table_code = cls.__check_table_code(table_code)
 		# Формируем полную шапку запроса
 		full_header = cls.__header + cls.get_table_name_by_code(table_code)
-		
+
 		## Получаем список всех параметров для запроса
 		# Количество параметров для запроса = количество столбцов для каждой таблицы = количество запросов yield
 		list_all_parameters = list(i for i in cls.__get_setting_for_parameter(table_code))
@@ -159,62 +159,105 @@ class Settings:
 
 class Base():
 	""" """
+
 	def __init__(self):
+		self.all_parameters = Settings.get_db_connection_parameters()
+		self.parameters_without_database = Settings.get_db_connection_parameters(without_database=True)
 		self.db_name = Settings.get_name_database()
-		# Формируем полное имя с расширением
-		# self.full_name_database = f"{self.db_name}.db"
-
-		if self.__check_db():
-			# Если существует, то просто подключаемся
-			self.conn = psycopg2.connect(**Settings.get_db_connection_parameters())
-			self.cursor = self.conn.cursor()
-		else:
-			self.conn = psycopg2.connect(**Settings.get_db_connection_parameters(without_database=True))
-			# Установка автокоммита для создания базы данных
-			self.conn.autocommit = True
-			# Создание объекта курсора
-			self.cursor = self.conn.cursor()
-
-			# Формируем запрос, чтобы создать базу данных с указанным именем
-			create_db_query = sql.SQL("CREATE DATABASE {}").format(sql.Identifier(self.db_name))
-			# Создаём
-			self.cursor.execute(create_db_query)
-
-
-	def __check_db(self):
-		cursor = conn.cursor()
-		
-		try:
-			# Попытка выполнить запрос к базе данных
-			sql_query = sql.SQL("SELECT 1 FROM pg_database WHERE datname = %s;")
-			cursor.execute(sql_query, (database_name,))
-			result = cursor.fetchone()
-			return bool(result)
-		except Exception as e:
-			# Обработка ошибок (например, отсутствие прав на выполнение запроса)
-			print(f"Ошибка при проверке существования базы данных: {e}")
-			return False
-		finally:
-			cursor.close()
-			return os.path.isfile(self.db_name)
-
-	def __connect(self):
-		self.conn = sqlite3.connect(self.full_name_database)
-		self.cursor = self.conn.cursor()
 
 	def saving_changes(self):
-		self.conn.commit()
+		self.connection.commit()
 
-	def __create_new_file_db(self):
-		# Создаём новый файл с базой, и подключаемся к нему
-		self.__connect()
+	# def connect(self):
+	# 	try:
+	# 		# Подключение к PostgreSQL
+	# 		self.connection = psycopg2.connect(**self.parameters_without_database)
+				
+	# 		# Проверка существования базы данных
+	# 		if self.check_database_existence():
 
-		# Для каждой таблицы, формируем персональный запрос
-		for code_table in Settings.get_list_codes_tables():
-			# Создаём таблицу
-			self.cursor.execute(Settings.get_query(code_table))
-			self.saving_changes()
+	# 			print(f"База данных '{self.db_name}' уже существует. Подключение...")
+	# 			self.connection = psycopg2.connect(**self.all_parameters)
+	# 			self.cursor = self.connection.cursor()
 
+	# 			# print("Вывести все данные из таблицы!!!")
+	# 			# self.print_data()
+	# 		else:
+	# 			# Создание базы данных, если её нет
+	# 			self.create_database()
+
+	# 			# После создания базы данных переподключаемся
+	# 			self.connection.close()
+	# 			self.connection = psycopg2.connect(**self.all_parameters)
+	# 			print(f"Успешное подключение к базе данных '{self.db_name}'.")
+	# 	except Exception as e:
+	# 		# Обработка общих ошибок подключения
+	# 		print(f"Ошибка при подключении к базе данных: {e}")
+	# 	# finally:
+	# 	# 	if self.connection:
+	# 	# 		self.connection.close()
+
+	# def check_database_existence(self):
+	# 	"""Проверка существования базы данных."""
+	# 	# Подключение к PostgreSQL
+	# 	self.connection = psycopg2.connect(**self.parameters_without_database)
+	# 	self.cursor = self.connection.cursor()
+	# 	try:
+	# 		self.connection.set_session(autocommit=True)
+
+	# 		sql_query = sql.SQL("SELECT 1 FROM pg_database WHERE datname = %s;")
+	# 		self.cursor.execute(sql_query, (self.db_name,))
+	# 		result = self.cursor.fetchone()
+	# 		return bool(result)
+	# 	except Exception as e:
+	# 		# Обработка ошибок (например, отсутствие прав на выполнение запроса)
+	# 		print(f"Ошибка при проверке существования базы данных: {e}")
+	# 		return False
+	# 	finally:
+	# 		self.cursor.close()
+
+	def create_database(self):
+		"""Создание новой базы данных"""
+		self.connection = psycopg2.connect(**self.parameters_without_database)
+		self.cursor = self.connection.cursor()
+		try:
+			self.connection.set_session(autocommit=True)
+			# Создание пустой базы данных
+			self.cursor.execute(f"CREATE DATABASE {self.db_name};")
+			print(f"База данных '{self.db_name}' создана успешно.")
+			self.connection.close()
+
+		except Exception as e:
+			# Обработка ошибок при создании базы данных
+			print(f"Ошибка при создании базы данных: {e}")
+			self.connection.rollback()
+		finally:
+			self.cursor.close()
+
+	def create_table(self, table_code):
+		# Формируем таблицу по указанному коду
+		self.connection = psycopg2.connect(**self.all_parameters)
+		self.cursor = self.connection.cursor()
+		self.cursor.execute(Settings.get_query(table_code))
+		self.saving_changes()
+
+	# def check_table_existence(self, table_name):
+	# 	"""Проверка существования таблицы в базе данных."""
+	# 	self.connection = psycopg2.connect(**self.all_parameters)
+	# 	self.cursor = self.connection.cursor()
+	# 	try:
+	# 		self.connection.set_session(autocommit=True)
+
+	# 		sql_query = sql.SQL("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = %s);")
+	# 		self.cursor.execute(sql_query, (table_name,))
+	# 		result = self.cursor.fetchone()
+	# 		return bool(result[0])
+	# 	except Exception as e:
+	# 		# Обработка ошибок (например, отсутствие прав на выполнение запроса)
+	# 		print(f"Ошибка при проверке существования таблицы: {e}")
+	# 		return False
+		# finally:
+		# 	self.cursor.close()
 
 	def get_num_all_rows(self):
 		""" """
@@ -224,6 +267,7 @@ class Base():
 
 	def get_all_from_table(self):
 		"""Получить все данные таблицы"""
+		print(self.__name_table)
 		self.cursor.execute(f"SELECT * FROM {self.__name_table}")
 		return self.cursor.fetchall()
 
@@ -251,14 +295,29 @@ class Base():
 		self.cursor.close()
 		self.conn.close()
 
-
 class SearchTemplates(Base):
 	""" """
 
 	def __init__(self):
-		# Пред записью в переменную экземпляра, проверяем существует ли такое имя
-		self.__name_table = Settings.get_table_name_by_code("ST")
+		super().__init__()
+		self.__table_code = "ST"
+		self.__name_table = Settings.get_table_name_by_code(self.__table_code)
 		self.__number = Settings.is_column_present("number")
+		
+		# if not self.check_database_existence():
+		# print("Если базы нет, то создаём")
+		self.create_database()
+		# print("ST База уже существует!")
+
+		# if not self.check_table_existence(self.__name_table):
+		# 	print("ST Таблица отсутствует, создаём")
+		self.create_table(self.__table_code)
+		
+
+		self.connection = psycopg2.connect(**self.all_parameters)
+		self.cursor = self.connection.cursor()
+		print(f"База данных '{self.db_name}' уже существует. Подключение...")
+		
 
 	def create_new_row(self, new_key, new_url):
 		number_rows = self.get_num_all_rows()
@@ -345,3 +404,15 @@ class VisitsList(Base):
 		)
 
 		self.saving_changes()
+
+
+
+# создание таблицы
+# self.create_table()
+# print("Создана таблица!")
+
+# # Вставка данных в таблицу
+# self.add_new_row("Lole", 25)
+# self.add_new_row("Xerlic", -4)
+# self.add_new_row("optimus", 154)
+# print("Данные записаны")
