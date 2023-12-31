@@ -43,26 +43,26 @@ class Settings:
 	__number = ("number", "INTEGER NOT NULL")
 	__key = ("key", "TEXT NOT NULL")
 	__url = ("url", "TEXT NOT NULL")
-	__lastDateTime = ("lastDateTime", "TIMESTAMP NOT NULL")
-	__numberVisits = ("numberVisits", "INTEGER NOT NULL")
+	__lastDateTime = ("last_date_time", "TIMESTAMP NOT NULL")
+	__numberVisits = ("number_visits", "INTEGER NOT NULL")
 
 	__header = "CREATE TABLE IF NOT EXISTS "
 
 	__database_structure = {
 		"ST": {
-			"name_table" : "SearchTemplates",
+			"name_table" : "search_templates",
 			"column_1" : __number,
 			"column_2" : __key,
 			"column_3" : __url
 			},
 		"BL": {
-			"name_table" : "BlackList",
+			"name_table" : "black_list",
 			"column_1" : __number,
 			"column_2" : __key,
 			"column_3" : __url
 			},
 		"VL": {
-			"name_table" : "VisitsList",
+			"name_table" : "visits_list",
 			"column_1" : __lastDateTime,
 			"column_2" : __numberVisits,
 			"column_3" : __url
@@ -299,8 +299,8 @@ class VisitsList(Base):
 	def __init__(self):
 		super().__init__(table_code="VL")
 		self.url = Settings.is_column_present("url")
-		self.numberVisits = Settings.is_column_present("numberVisits")
-		self.lastDateTime = Settings.is_column_present("lastDateTime")
+		self.numberVisits = Settings.is_column_present("number_visits")
+		self.lastDateTime = Settings.is_column_present("last_date_time")
 
 	def get_current_datetime(self):
 		pattern = "%H:%M:%S %d.%m.%Y"
