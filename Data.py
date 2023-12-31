@@ -194,9 +194,14 @@ class Base():
 			self.cursor.execute(f"CREATE DATABASE {self.db_name};")
 			print(f"База данных '{self.db_name}' создана успешно.")
 
+		except psycopg2.errors.DuplicateDatabase:
+			# Если база данных уже создана, то ошибку не выводим
+			# Возвращаем базу данных к состоянию до выполнения запроса
+			self.connection.rollback()
 		except Exception as e:
-			# Обработка ошибок при создании базы данных
+			# Обработка остальных ошибок при создании базы данных
 			print(f"Ошибка при создании базы данных: {e}")
+			# Возвращаем базу данных к состоянию до выполнения запроса
 			self.connection.rollback()
 		finally:
 			self.close()
