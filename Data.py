@@ -193,14 +193,13 @@ class Base():
 			# Создание пустой базы данных
 			self.cursor.execute(f"CREATE DATABASE {self.db_name};")
 			print(f"База данных '{self.db_name}' создана успешно.")
-			self.connection.close()
 
 		except Exception as e:
 			# Обработка ошибок при создании базы данных
 			print(f"Ошибка при создании базы данных: {e}")
 			self.connection.rollback()
 		finally:
-			self.cursor.close()
+			self.close()
 
 	def table_exists(self, table_code):
 		# Формируем таблицу по указанному коду
