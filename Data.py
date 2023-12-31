@@ -160,10 +160,23 @@ class Settings:
 class Base():
 	""" """
 
-	def __init__(self):
+	def __init__(self, table_code):
 		self.all_parameters = Settings.get_db_connection_parameters()
 		self.parameters_without_database = Settings.get_db_connection_parameters(without_database=True)
 		self.db_name = Settings.get_name_database()
+
+		self.table_code = table_code
+		self.name_table = Settings.get_table_name_by_code(self.table_code)
+		self.number = Settings.is_column_present("number")
+		
+		# Если базы данных не существует, то создаём её
+		self.database_exists()
+
+		# Если указанной таблицы не существует, то создаём её
+		self.table_exists(self.table_code)
+		
+		self.connection = psycopg2.connect(**self.all_parameters)
+		self.cursor = self.connection.cursor()
 
 	def saving_changes(self):
 		self.connection.commit()
@@ -233,20 +246,7 @@ class SearchTemplates(Base):
 	""" """
 
 	def __init__(self):
-		super().__init__()
-		self.table_code = "ST"
-		self.name_table = Settings.get_table_name_by_code(self.table_code)
-		self.number = Settings.is_column_present("number")
-		
-		# Если базы данных не существует, то создаём её
-		self.database_exists()
-
-		# Если указанной таблицы не существует, то создаём её
-		self.table_exists(self.table_code)
-		
-		self.connection = psycopg2.connect(**self.all_parameters)
-		self.cursor = self.connection.cursor()
-		# print(f"База данных '{self.db_name}' уже существует. Подключение...")
+		super().__init__(table_code="ST")
 		
 	def create_new_row(self, new_key, new_url):
 		number_rows = self.get_num_all_rows()
@@ -290,41 +290,17 @@ class BlackList(SearchTemplates):
 	""" """
 
 	def __init__(self):
-		super().__init__()
-		self.table_code = "BL"
-		self.name_table = Settings.get_table_name_by_code(self.table_code)
-		self.number = Settings.is_column_present("number")
-		
-		# Если базы данных не существует, то создаём её
-		self.database_exists()
-
-		# Если указанной таблицы не существует, то создаём её
-		self.table_exists(self.table_code)
-		
-		self.connection = psycopg2.connect(**self.all_parameters)
-		self.cursor = self.connection.cursor()
+		Base.__init__(self, table_code="BL")
 
 
 class VisitsList(Base):
 	""" """
 
 	def __init__(self):
-		super().__init__()
-		self.table_code = "VL"
-		self.name_table = Settings.get_table_name_by_code(self.table_code)
-		self.number = Settings.is_column_present("number")
+		super().__init__(table_code="VL")
 		self.url = Settings.is_column_present("url")
 		self.numberVisits = Settings.is_column_present("numberVisits")
 		self.lastDateTime = Settings.is_column_present("lastDateTime")
-		
-		# Если базы данных не существует, то создаём её
-		self.database_exists()
-
-		# Если указанной таблицы не существует, то создаём её
-		self.table_exists(self.table_code)
-		
-		self.connection = psycopg2.connect(**self.all_parameters)
-		self.cursor = self.connection.cursor()
 
 	def get_current_datetime(self):
 		pattern = "%H:%M:%S %d.%m.%Y"
