@@ -175,16 +175,19 @@ class Base():
 		# Если указанной таблицы не существует, то создаём её
 		self.table_exists(self.table_code)
 		
-		self.connection = psycopg2.connect(**self.all_parameters)
-		self.cursor = self.connection.cursor()
+		self.connect_to_database(self.all_parameters)
 
 	def saving_changes(self):
 		self.connection.commit()
 
-	def database_exists(self):
-		"""Создание новой базы данных"""
-		self.connection = psycopg2.connect(**self.parameters_without_database)
+	def connect_to_database(self, parameters_database):
+		"""Подключаемся к базе данных"""
+		self.connection = psycopg2.connect(**parameters_database)
 		self.cursor = self.connection.cursor()
+
+	def database_exists(self):
+		"""Создание новой базы данных, если её не существует"""
+		self.connect_to_database(self.parameters_without_database)
 		try:
 			self.connection.set_session(autocommit=True)
 			# Создание пустой базы данных
@@ -201,8 +204,8 @@ class Base():
 
 	def table_exists(self, table_code):
 		# Формируем таблицу по указанному коду
-		self.connection = psycopg2.connect(**self.all_parameters)
-		self.cursor = self.connection.cursor()
+		self.connect_to_database(self.all_parameters)
+
 		self.cursor.execute(Settings.get_query(table_code))
 		self.saving_changes()
 
