@@ -243,7 +243,7 @@ class Base():
 	def close(self):
 		self.saving_changes()
 		self.cursor.close()
-		self.conn.close()
+		self.connection.close()
 
 class SearchTemplates(Base):
 	""" """
