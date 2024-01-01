@@ -1,6 +1,5 @@
 # import threading
 import psycopg2
-from psycopg2 import sql
 from os import environ
 from datetime import datetime
 
