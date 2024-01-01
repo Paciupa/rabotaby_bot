@@ -44,6 +44,7 @@ class Settings:
 	__url = ("url", "TEXT NOT NULL")
 	__lastDateTime = ("last_date_time", "TIMESTAMP NOT NULL")
 	__numberVisits = ("number_visits", "INTEGER NOT NULL")
+	__included = ("included", "BOOLEAN NOT NULL")
 
 	__header = "CREATE TABLE IF NOT EXISTS "
 
@@ -52,13 +53,15 @@ class Settings:
 			"name_table" : "search_templates",
 			"column_1" : __number,
 			"column_2" : __key,
-			"column_3" : __url
+			"column_3" : __url,
+			"column_4" : __included
 			},
 		"BL": {
 			"name_table" : "black_list",
 			"column_1" : __number,
 			"column_2" : __key,
-			"column_3" : __url
+			"column_3" : __url,
+			"column_4" : __included
 			},
 		"VL": {
 			"name_table" : "visits_list",
@@ -253,13 +256,14 @@ class SearchTemplates(Base):
 
 	def __init__(self):
 		super().__init__(table_code="ST")
+		self.included = Settings.is_column_present("included")
 		
-	def create_new_row(self, new_key, new_url):
+	def create_new_row(self, new_key, new_url, is_included=True):
 		number_rows = self.get_num_all_rows()
 		# Создаём номер новой строки
 		next_number = number_rows + 1
 		# Создаём новую строку со необходимыми значениями
-		super().create_new_row(self.name_table, next_number, new_key, new_url)
+		super().create_new_row(self.name_table, next_number, new_key, new_url, is_included)
 
 	def delete_row_by_number(self, number):
 		"""Удаляем строку по номеру"""
@@ -291,12 +295,27 @@ class SearchTemplates(Base):
 
 		self.saving_changes()
 
+	def set_states_template(self, number, new_state):
+		"""Презаписываем текущее состояние шаблона/исключения на новое. Допускается лишь True/False
+		
+			Если True - то шаблон/исключение используется в поиске
+			Если False - то шаблон/исключение не используется в поиске
+		"""
+
+		self.cursor.execute(
+			f"UPDATE {self.name_table} SET {self.included} = %s WHERE {self.number} = %s",
+			(new_state, number),
+		)
+		# Сортируем строки по номеру, так как после изменения состояния, строка смещается(почему?)
+		self.__update_col_number()
+
 
 class BlackList(SearchTemplates):
 	""" """
 
 	def __init__(self):
 		Base.__init__(self, table_code="BL")
+		self.included = Settings.is_column_present("included")
 
 
 class VisitsList(Base):
