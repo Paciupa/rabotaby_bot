@@ -48,6 +48,7 @@ class CS(StatesGroup):
 async def is_user_ID(message):
 	return message.from_user.id == int(user_id)
 
+# TODO Удалить повторяющийся код. Оптимизировать функции
 
 @dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message, state: FSMContext):
