@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
-from Data import Base, SearchTemplates, BlackList, VisitsList
+from Data import SearchTemplates, BlackList, VisitsList
 # import Main
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
