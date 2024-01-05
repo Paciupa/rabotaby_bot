@@ -1,6 +1,10 @@
 __pycache__/
-.venv/
-config.py
+
+.venv*/
+
+.idea/
+.vscode/
+
 temp/
+config.py
 *.db
-.vscode/*
