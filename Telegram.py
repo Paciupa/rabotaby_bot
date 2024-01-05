@@ -284,9 +284,9 @@ async def state_b_number(message: types.Message, state: FSMContext):
 	try:
 		number_exception = int(msg)
 	except ValueError as err:
-		# Если вместо числа принимается команда /print_t, то запускаем функцию print_t, без выполнения остального кода
-		if msg == "/print_t":
-			await print_t(message)
+		# Если вместо числа принимается команда /print_b, то запускаем функцию /print_b, без выполнения остального кода
+		if msg == "/print_b":
+			await print_b(message)
 		else:
 			# Если полученное число неправильное, то выводится сообщение об ошибке
 			print(err)
