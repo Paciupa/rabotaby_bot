@@ -328,7 +328,7 @@ class VisitsList(Base):
 		self.lastDateTime = Settings.is_column_present("last_date_time")
 
 	def get_current_datetime(self):
-		pattern = "%H:%M:%S %d.%m.%Y"
+		pattern = "%Y-%m-%d %H:%M:%S"
 		now = datetime.now()
 		return now.strftime(pattern)
 
