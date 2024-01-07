@@ -104,9 +104,20 @@ def get_vacancy_name(obj):
 	return vacancy_name.get_text(strip=True)
 
 def get_wage(obj):
+	# Есть два варианта получения ЗП
+	# Вариант 1
 	wage = obj.find("span",  class_="bloko-header-section-2 bloko-header-section-2_lite", attrs={"data-qa": "vacancy-salary-compensation-type-gross"})
-	# Если информация о ЗП не существует, то выводим "?"
-	return wage.get_text() if wage else "?"
+	if wage:
+		return wage.get_text()
+
+	# Вариант 2
+	wage2 = obj.find("span",  class_="bloko-header-section-2 bloko-header-section-2_lite", attrs={"data-qa": "vacancy-salary-compensation-type-net"})
+
+	if wage2:
+		return wage2.get_text()
+	else:
+		# Если информация о ЗП не существует во всех вариантах, то выводим "?"
+		return "?"
 
 def get_name_company(obj):
 	name_company = obj.find("span", class_="bloko-header-section-2 bloko-header-section-2_lite", attrs={"data-qa": "bloko-header-2"})
