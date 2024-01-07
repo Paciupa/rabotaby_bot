@@ -122,8 +122,7 @@ async def del_t_input(message: types.Message, state: FSMContext):
 	msg = message.text
 
 	try:
-		# templace - такое слово не существует. Изменить
-		number_templace = int(msg)
+		number_template = int(msg)
 	except ValueError as err:
 		# Если вместо числа принимается команда /print_t, то запускаем функцию print_t, без выполнения остального кода
 		if msg == "/print_t":
@@ -134,8 +133,8 @@ async def del_t_input(message: types.Message, state: FSMContext):
 			await bot.send_message(message.chat.id, "❌ Неверное значение! Укажите число из списка")
 	else:
 		# Если try выполнился, то запускается else (код ниже)
-		if st.get_num_all_rows() >= number_templace > 0:
-			st.delete_row_by_number(number_templace)
+		if st.get_num_all_rows() >= number_template > 0:
+			st.delete_row_by_number(number_template)
 			await bot.send_message(message.chat.id, "✅ Номер шаблона успешно удалён!")
 			await state.set_state(CS.AVAILABLE)
 		else:
