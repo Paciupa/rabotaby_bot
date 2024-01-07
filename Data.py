@@ -43,7 +43,6 @@ class Settings:
 	__key = ("key", "TEXT NOT NULL")
 	__url = ("url", "TEXT NOT NULL")
 	__lastDateTime = ("last_date_time", "TIMESTAMP NOT NULL")
-	__numberVisits = ("number_visits", "INTEGER NOT NULL")
 	__included = ("included", "BOOLEAN NOT NULL")
 
 	__header = "CREATE TABLE IF NOT EXISTS "
@@ -66,7 +65,7 @@ class Settings:
 		"VL": {
 			"name_table" : "visits_list",
 			"column_1" : __lastDateTime,
-			"column_2" : __numberVisits,
+			"column_2" : __key,
 			"column_3" : __url
 			}
 	}
@@ -323,8 +322,6 @@ class VisitsList(Base):
 
 	def __init__(self):
 		super().__init__(table_code="VL")
-		self.url = Settings.is_column_present("url")
-		self.numberVisits = Settings.is_column_present("number_visits")
 		self.lastDateTime = Settings.is_column_present("last_date_time")
 
 	def get_current_datetime(self):
@@ -337,22 +334,7 @@ class VisitsList(Base):
 		# Создаём новую строку со необходимыми значениями
 		# Так как это список посещений, то при создании новой строки, количество посещений = 1
 		super().create_new_row(self.name_table, current_datetime, 1, url)
-	
-	def get_visits(self, url):
-		# Получаем количество посещений по адресу
-		self.cursor.execute(
-			f"SELECT {self.numberVisits} FROM {self.name_table} WHERE {self.url}=%s", (url,)
-		)
-		return self.cursor.fetchone()[0]
 
-	def update_visits(self, url):
-		current_visits = self.get_visits(url)
-		current_datetime = self.get_current_datetime()
 
-		# КоличествоПосещений, Время/Дата последнего посещения, url
-		self.cursor.execute(
-			f"UPDATE {self.name_table} SET {self.numberVisits} = %s, {self.lastDateTime} = %s WHERE {self.url} = %s",
-			(current_visits + 1, current_datetime, url),
-		)
 
 		self.saving_changes()
