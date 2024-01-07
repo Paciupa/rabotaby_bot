@@ -155,13 +155,17 @@ def get_the_rest(obj):
 	return city, street_with_house, metro_stations, yandex_url, google_url
 ######################### Работа со страницами вакансий
 
-
 keys_and_urls = get_list_keys_and_templates()
 
-## обновить список посещённых ссылок
-# Например: если дата посещённой ссылки больше за 1 неделю, то она оттуда удаляется
-
 for key, url in keys_and_urls:
+	## Перед всеми проверками и запросами, очищаем список посещений, если есть старые вакансии
+	# Например: если дата посещённой ссылки больше за 1 неделю, то она оттуда удаляется
+	# 1 час = 1
+	# 1 день = 24
+	# 1 неделя = 168
+	# 1 месяц = 4 недели = 672
+	vl.delete_rows_after_time(key, hours=168)
+
 	page = requests.get(url, headers=headers)
 	soup = BeautifulSoup(page.text, "html.parser")
 
@@ -190,7 +194,7 @@ for key, url in keys_and_urls:
 	if all_urls != []:
 		# После того, как прошли все проверки, записываем оставшиеся urls(уникальные) в список посещений
 		for url in all_urls:
-			vl.create_new_row(url)
+			vl.create_new_row(key, url)
 
 		## Заходим на каждый url, и достаём оттуда информацию о посте
 		# Название вакансии, ЗП, Название фирмы, Адрес, и прочее
