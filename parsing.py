@@ -40,10 +40,13 @@ def get_visit_list():
 
 def get_number_vacancies(soup):
 	conteiners = soup.findAll('h1', class_='bloko-header-section-3')
+	try:
+		# Извлекаем текст с числом из контейнера
+		text_string = conteiners[0].get_text(strip=True)
+	except IndexError as _:
+		# Если вакансий нет, то возвращаем 0
+		return 0
 	
-	# Извлекаем текст с числом из контейнера
-	text_string = conteiners[0].get_text(strip=True)
-
 	# Отрезаем концовку текста, на случай, если в самом запросе были числа
 	# 9 символов = 999999999 вакансиям. Это количество должно быть достаточно для проверки
 	text_string = text_string[:9]
