@@ -134,6 +134,11 @@ async def del_t_input(message: types.Message, state: FSMContext):
 	else:
 		# Если try выполнился, то запускается else (код ниже)
 		if st.get_num_all_rows() >= number_template > 0:
+			key_template = st.get_key_by_number(number_template)
+			# Удаляем записи из списка посещений по ключу шаблона
+			vl.delete_rows_by_key(key_template)
+			# Удаляем сам шаблон поиска. Указываем его номер
+			# Удаляем через номер, так как в боте удобнее писать число, а не целый ключ
 			st.delete_row_by_number(number_template)
 			await bot.send_message(message.chat.id, "✅ Номер шаблона успешно удалён!")
 			await state.set_state(CS.AVAILABLE)

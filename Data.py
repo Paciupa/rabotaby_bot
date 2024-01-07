@@ -245,16 +245,24 @@ class Base():
 		self.cursor.execute(query, args)
 		self.saving_changes()
 
+	def delete_row_by_value(self, name_row, value):
+		"""Удаляем строку/строки по значению в столбце"""
+		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {name_row}=%s", (value,))
+
+		self.saving_changes()
+
 	def close(self):
 		self.saving_changes()
 		self.cursor.close()
 		self.connection.close()
+
 
 class SearchTemplates(Base):
 	""" """
 
 	def __init__(self):
 		super().__init__(table_code="ST")
+		self.key = Settings.is_column_present("key")
 		self.included = Settings.is_column_present("included")
 		
 	def create_new_row(self, new_key, new_url, is_included=True):
@@ -267,9 +275,7 @@ class SearchTemplates(Base):
 
 	def delete_row_by_number(self, number):
 		"""Удаляем строку по номеру"""
-		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {self.number}=%s", (number,))
-
-		self.saving_changes()
+		super().delete_row_by_value(self.number, number)
 
 		# обновляем нумерацию в столбце number. Так как при удалении появился разрыв в нумерации
 		self.__update_col_number()
@@ -308,6 +314,14 @@ class SearchTemplates(Base):
 		)
 		# Сортируем строки по номеру, так как после изменения состояния, строка смещается(почему?)
 		self.__update_col_number()
+	
+	def get_key_by_number(self, number_template):
+		"""Получить ключ зная номер шаблона"""
+		self.cursor.execute(
+			f"SELECT {self.key} FROM {self.name_table} WHERE {self.number} = %s;", 
+			(number_template,)
+		)
+		return self.cursor.fetchone()[0]
 
 
 class BlackList(SearchTemplates):
@@ -352,4 +366,8 @@ class VisitsList(Base):
 		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s", (key, time_threshold))
 
 		self.saving_changes()
+	
+	def delete_rows_by_key(self, key):
+		"""Удаляем строки по ключу"""
+		super().delete_row_by_value(self.key, key)
 	
