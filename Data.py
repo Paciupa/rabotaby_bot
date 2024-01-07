@@ -1,7 +1,7 @@
 # import threading
 import psycopg2
 from os import environ
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 # TODO
@@ -263,6 +263,7 @@ class SearchTemplates(Base):
 		next_number = number_rows + 1
 		# Создаём новую строку со необходимыми значениями
 		super().create_new_row(self.name_table, next_number, new_key, new_url, is_included)
+		self.__update_col_number()
 
 	def delete_row_by_number(self, number):
 		"""Удаляем строку по номеру"""
@@ -320,21 +321,35 @@ class BlackList(SearchTemplates):
 class VisitsList(Base):
 	""" """
 
+	pattern = "%Y-%m-%d %H:%M:%S"
+
 	def __init__(self):
 		super().__init__(table_code="VL")
+		self.key = Settings.is_column_present("key")
 		self.lastDateTime = Settings.is_column_present("last_date_time")
 
-	def get_current_datetime(self):
-		pattern = "%Y-%m-%d %H:%M:%S"
-		now = datetime.now()
-		return now.strftime(pattern)
+	@classmethod
+	def get_pattern(cls):
+		return cls.pattern
 
-	def create_new_row(self, url):
+	def get_current_datetime(self):
+		now = datetime.now()
+		return now.strftime(self.get_pattern())
+
+	def create_new_row(self, key, url):
 		current_datetime = self.get_current_datetime()
 		# Создаём новую строку со необходимыми значениями
-		# Так как это список посещений, то при создании новой строки, количество посещений = 1
-		super().create_new_row(self.name_table, current_datetime, 1, url)
+		super().create_new_row(self.name_table, current_datetime, key, url)
 
+	def delete_rows_after_time(self, key, hours):
+		"""Удаляем строки по истечении времени с определённым ключом"""
+		# Получаем текущую дату в удобном формате
+		current_datetime = datetime.strptime(self.get_current_datetime(), self.get_pattern())
 
+		# Определяем временной интервал
+		time_threshold = current_datetime - timedelta(hours=hours)
+
+		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s", (key, time_threshold))
 
 		self.saving_changes()
+	
