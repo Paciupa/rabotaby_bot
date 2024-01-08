@@ -7,6 +7,7 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from Data import SearchTemplates, BlackList, VisitsList
+import parsing
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
 telegram_key = environ.get('API_TELEGRAM_KEY')
@@ -356,6 +357,38 @@ async def print_b(message: types.Message):
 # 		await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
 # 		await state.set_state(CS.AVAILABLE)
 
+async def send_to_user(param):
+	vacancy_name_emoji = "🎫"
+	wage_emoji = "💰"
+	name_company_emoji = "🏢"
+	metro_emoji = "Ⓜ️"
+	address_emoji = "🌍"
+
+	# Формируем сообщение
+	text_message = f"""#{param['key']}
+	{vacancy_name_emoji} <a href="{param['url']}">{param['vacancy_name']}</a>
+	{wage_emoji} {param['wage']}
+	{name_company_emoji} {param['name_company']}
+	{metro_emoji} {param['metro']}
+	{address_emoji} {param['city']} {param['street']} (<a href="{param['yandex_url']}">YandexMap</a>, <a href="{param['google_url']}">GoogleMap</a>)"""
+
+	# Удаляем табы из сообщения, так как мешают
+	text_message = text_message.replace("	", "")
+
+	# Используем parse_mode='HTML', так как при Markdown нужно маскировать '(' на '\\('
+	# Это приводит к нарушению работы ссылок в сообщении
+	await bot.send_message(user_id, text_message, parse_mode='HTML')
+
+async def background_task():
+	while True:
+		for all_param in parsing.get_param_for_msg():
+			await send_to_user(all_param) 
+		
+		await asyncio.sleep(10)
+
+async def on_startup(dp):
+    # Запускаем фоновую задачу при старте бота
+    asyncio.create_task(background_task())
 
 if __name__ == "__main__":
-	executor.start_polling(dp, skip_updates=True)
+	executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
