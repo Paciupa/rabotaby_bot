@@ -1,6 +1,5 @@
 import asyncio
 from os import environ
-# import threading
 
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.dispatcher import FSMContext
@@ -8,7 +7,6 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 
 from Data import SearchTemplates, BlackList, VisitsList
-# import Main
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
 telegram_key = environ.get('API_TELEGRAM_KEY')
@@ -40,9 +38,6 @@ class CS(StatesGroup):
 	STATE_B1 = State()
 	STATE_B2 = State()
 	SET_TIME = State()
-
-# def run_telegram():
-# 	executor.start_polling(dp, skip_updates=True)
 
 
 async def is_user_ID(message):

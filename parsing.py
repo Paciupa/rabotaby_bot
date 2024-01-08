@@ -185,26 +185,21 @@ def get_param_for_msg():
 		soup = BeautifulSoup(page.text, "html.parser")
 
 		number_results = get_number_vacancies(soup)
-		print(number_results)
 		max_number_pages = get_num_pages(number_results)
 
 		# Выводим все urls из выдачи rabota.by
 		all_urls = get_all_vacancies_on_all_pages(url, max_number_pages)
-		# print(all_urls, len(all_urls))
 
 		# Получаем все all_urls в BlackList
 		black_list = get_black_list()
-		# print(black_list, len(black_list))
 
 		# Удаляем из выдачи те urls которые находятся в чёрном списке
 		all_urls = list(set(all_urls) - set(black_list))
-		# print(all_urls, len(all_urls))
 
 		# Получить список уже ранее выведенных вакансий(список посещений)
 		visit_list = get_visit_list()
 		# Получаем список urls которые ранее не выводились боте
 		all_urls = list(set(all_urls) - set(visit_list))
-		# print(all_urls, len(all_urls))
 
 		if all_urls != []:
 			# После того, как прошли все проверки, записываем оставшиеся urls(уникальные) в список посещений
@@ -223,8 +218,6 @@ def get_param_for_msg():
 
 				city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2)
 				
-				# Отправляем инфу в бота
-				# send_to_bot(key, name_vacancies, wage, name_company, address)
 				metro = ", ".join(metro_stations)
 
 				print(vacancy_name)
