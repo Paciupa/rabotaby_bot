@@ -124,8 +124,12 @@ def get_name_company(obj):
 	# Если имени компании не существует, то выводим "?"
 	return name_company.get_text() if name_company else "?"
 
-def get_the_rest(obj):
+def get_the_rest(obj, name_company):
 	full_address = obj.find('span', attrs={'data-qa': 'vacancy-view-raw-address'})
+	
+	# # TODO Почему так
+	# name_company = get_name_company(obj)
+
 	# Если контейнер с адресом существует, тогда разбираем его на город, метро, адрес дома и улицы
 	if full_address != None:
 		city = full_address.contents[0].strip()
@@ -184,7 +188,9 @@ def get_param_for_msg():
 		page = requests.get(url, headers=headers)
 		soup = BeautifulSoup(page.text, "html.parser")
 
+		# Получаем количество найденных вакансий
 		number_results = get_number_vacancies(soup)
+		# Считаем сколько будет страниц
 		max_number_pages = get_num_pages(number_results)
 
 		# Выводим все urls из выдачи rabota.by
@@ -199,10 +205,11 @@ def get_param_for_msg():
 		# Получить список уже ранее выведенных вакансий(список посещений)
 		visit_list = get_visit_list()
 		# Получаем список urls которые ранее не выводились боте
+		# то есть, удаляем из выдачи те urls которые находятся в список посещений
 		all_urls = list(set(all_urls) - set(visit_list))
 
 		if all_urls != []:
-			# После того, как прошли все проверки, записываем оставшиеся urls(уникальные) в список посещений
+			# После того, как прошли все проверки, записываем оставшиеся urls(новые) в список посещений
 			for url in all_urls:
 				vl.create_new_row(key, url)
 
@@ -216,7 +223,7 @@ def get_param_for_msg():
 				wage = get_wage(soup2)
 				name_company = get_name_company(soup2)
 
-				city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2)
+				city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2, name_company)
 				
 				metro = ", ".join(metro_stations)
 
