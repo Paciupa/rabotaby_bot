@@ -233,19 +233,5 @@ def get_param_for_msg():
 					"google_url": google_url,
 				}
 
-
-
-# print(f"""
-# 	-------------------------------------------
-# 	KEY: #{key};
-# 	URL: {url};
-# 	Название: {vacancy_name};
-# 	ЗП: {wage};
-# 	Фирма: {name_company};
-# 	Адрес: {city} {street};
-# 	Метро: {metro};
-# 	YM: {yandex_url};
-# 	GM: {google_url};
-# 				""")
 				# Отправляем параметры в бота, для дальнейшего форматирования
 				yield param
