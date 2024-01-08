@@ -169,70 +169,91 @@ def get_the_rest(obj):
 	return city, street_with_house, metro_stations, yandex_url, google_url
 ######################### Работа со страницами вакансий
 
-keys_and_urls = get_list_keys_and_templates()
+def get_param_for_msg():
+	keys_and_urls = get_list_keys_and_templates()
 
-for key, url in keys_and_urls:
-	## Перед всеми проверками и запросами, очищаем список посещений, если есть старые вакансии
-	# Например: если дата посещённой ссылки больше за 1 неделю, то она оттуда удаляется
-	# 1 час = 1
-	# 1 день = 24
-	# 1 неделя = 168
-	# 1 месяц = 4 недели = 672
-	vl.delete_rows_after_time(key, hours=168)
+	for key, url in keys_and_urls:
+		## Перед всеми проверками и запросами, очищаем список посещений, если есть старые вакансии
+		# Например: если дата посещённой ссылки больше за 1 неделю, то она оттуда удаляется
+		# 1 час = 1
+		# 1 день = 24
+		# 1 неделя = 168
+		# 1 месяц = 4 недели = 672
+		vl.delete_rows_after_time(key, hours=168)
 
-	page = requests.get(url, headers=headers)
-	soup = BeautifulSoup(page.text, "html.parser")
+		page = requests.get(url, headers=headers)
+		soup = BeautifulSoup(page.text, "html.parser")
 
-	number_results = get_number_vacancies(soup)
-	print(number_results)
-	max_number_pages = get_num_pages(number_results)
+		number_results = get_number_vacancies(soup)
+		print(number_results)
+		max_number_pages = get_num_pages(number_results)
 
-	# Выводим все urls из выдачи rabota.by
-	all_urls = get_all_vacancies_on_all_pages(url, max_number_pages)
-	# print(all_urls, len(all_urls))
+		# Выводим все urls из выдачи rabota.by
+		all_urls = get_all_vacancies_on_all_pages(url, max_number_pages)
+		# print(all_urls, len(all_urls))
 
-	# Получаем все all_urls в BlackList
-	black_list = get_black_list()
-	# print(black_list, len(black_list))
+		# Получаем все all_urls в BlackList
+		black_list = get_black_list()
+		# print(black_list, len(black_list))
 
-	# Удаляем из выдачи те urls которые находятся в чёрном списке
-	all_urls = list(set(all_urls) - set(black_list))
-	# print(all_urls, len(all_urls))
+		# Удаляем из выдачи те urls которые находятся в чёрном списке
+		all_urls = list(set(all_urls) - set(black_list))
+		# print(all_urls, len(all_urls))
 
-	# Получить список уже ранее выведенных вакансий(список посещений)
-	visit_list = get_visit_list()
-	# Получаем список urls которые ранее не выводились боте
-	all_urls = list(set(all_urls) - set(visit_list))
-	# print(all_urls, len(all_urls))
+		# Получить список уже ранее выведенных вакансий(список посещений)
+		visit_list = get_visit_list()
+		# Получаем список urls которые ранее не выводились боте
+		all_urls = list(set(all_urls) - set(visit_list))
+		# print(all_urls, len(all_urls))
 
-	if all_urls != []:
-		# После того, как прошли все проверки, записываем оставшиеся urls(уникальные) в список посещений
-		for url in all_urls:
-			vl.create_new_row(key, url)
+		if all_urls != []:
+			# После того, как прошли все проверки, записываем оставшиеся urls(уникальные) в список посещений
+			for url in all_urls:
+				vl.create_new_row(key, url)
 
-		## Заходим на каждый url, и достаём оттуда информацию о посте
-		# Название вакансии, ЗП, Название фирмы, Адрес, и прочее
-		for url in all_urls:
-			page2 = requests.get(url, headers=headers)
-			soup2 = BeautifulSoup(page2.text, "html.parser")
+			## Заходим на каждый url, и достаём оттуда информацию о посте
+			# Название вакансии, ЗП, Название фирмы, Адрес, и прочее
+			for url in all_urls:
+				page2 = requests.get(url, headers=headers)
+				soup2 = BeautifulSoup(page2.text, "html.parser")
 
-			vacancy_name = get_vacancy_name(soup2)
-			wage = get_wage(soup2)
-			name_company = get_name_company(soup2)
+				vacancy_name = get_vacancy_name(soup2)
+				wage = get_wage(soup2)
+				name_company = get_name_company(soup2)
 
-			city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2)
-			
-			# Отправляем инфу в бота
-			# send_to_bot(key, name_vacancies, wage, name_company, address)
-			print(f"""
--------------------------------------------
-KEY: #{key};
-URL: {url};
-Название: {vacancy_name};
-ЗП: {wage};
-Фирма: {name_company};
-Адрес: {city} {street};
-Метро: {", ".join(metro_stations)};
-YM: {yandex_url};
-GM: {google_url};
-			""")
+				city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2)
+				
+				# Отправляем инфу в бота
+				# send_to_bot(key, name_vacancies, wage, name_company, address)
+				metro = ", ".join(metro_stations)
+
+				print(vacancy_name)
+				
+				all_param = {
+					"key": ("#", key),
+					"url": ("URL: ", url),
+					"vacancy_name": ("Название: ", vacancy_name),
+					"wage": ("ЗП: ", wage),
+					"name_company": ("Фирма: ", name_company),
+					"city": ("Адрес: ", city),
+					"street": ("", street),
+					"metro": ("Метро: ", metro),
+					"yandex_url": ("YM: ", yandex_url),
+					"google_url": ("GM: ", google_url),
+				}
+
+				yield all_param
+
+
+# print(f"""
+# 	-------------------------------------------
+# 	KEY: #{key};
+# 	URL: {url};
+# 	Название: {vacancy_name};
+# 	ЗП: {wage};
+# 	Фирма: {name_company};
+# 	Адрес: {city} {street};
+# 	Метро: {metro};
+# 	YM: {yandex_url};
+# 	GM: {google_url};
+# 				""")
