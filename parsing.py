@@ -220,22 +220,19 @@ def get_param_for_msg():
 				
 				metro = ", ".join(metro_stations)
 
-				print(vacancy_name)
-				
-				all_param = {
-					"key": ("#", key),
-					"url": ("URL: ", url),
-					"vacancy_name": ("Название: ", vacancy_name),
-					"wage": ("ЗП: ", wage),
-					"name_company": ("Фирма: ", name_company),
-					"city": ("Адрес: ", city),
-					"street": ("", street),
-					"metro": ("Метро: ", metro),
-					"yandex_url": ("YM: ", yandex_url),
-					"google_url": ("GM: ", google_url),
+				param = {
+					"key": key,
+					"url": url,
+					"vacancy_name": vacancy_name,
+					"wage": wage,
+					"name_company": name_company,
+					"city": city,
+					"street": street,
+					"metro": metro,
+					"yandex_url": yandex_url,
+					"google_url": google_url,
 				}
 
-				yield all_param
 
 
 # print(f"""
@@ -250,3 +247,5 @@ def get_param_for_msg():
 # 	YM: {yandex_url};
 # 	GM: {google_url};
 # 				""")
+				# Отправляем параметры в бота, для дальнейшего форматирования
+				yield param
