@@ -224,6 +224,9 @@ def get_param_for_msg():
 
 				city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2, name_company)
 				
+				# Так как в названии ключа могут быть пробелы, а как известно пробелы обрезают работу тега в сообщении. Поэтому заменяем все пробелы на нижние подчёркивания
+				key = key.replace(" ", "_")
+
 				metro = ", ".join(metro_stations)
 
 				param = {
