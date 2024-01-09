@@ -71,13 +71,16 @@ def get_num_pages(num_vacancies):
 		return int(number_pages)
 
 def get_all_vacancies_on_page(obj):
-	conteiners = obj.findAll('a', class_='serp-item__title')
+	conteiners = obj.findAll('h3', class_='bloko-header-section-3', attrs={"data-qa": "bloko-header-3"})
 	list_url_vacancy = []
 	for conteiner in conteiners:
-		href = conteiner['href']
-		# обрезаем лишнее в адресе
-		url_vacancy = href.split("?")[0]
-		list_url_vacancy.append(url_vacancy)
+		link = conteiner.find('a')
+		if link is not None:
+			href = link['href']
+			# обрезаем лишнее в адресе
+			url_vacancy = href.split("?")[0]
+			list_url_vacancy.append(url_vacancy)
+	print(list_url_vacancy)
 	return list_url_vacancy
 
 def get_all_vacancies_on_all_pages(url, max_number_pages):
