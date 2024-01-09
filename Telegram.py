@@ -41,6 +41,11 @@ class CS(StatesGroup):
 	SET_TIME = State()
 
 
+min_delay = 0
+max_delay = 180
+current_delay = 1
+
+
 async def is_user_ID(message):
 	return message.from_user.id == int(user_id)
 
@@ -340,22 +345,31 @@ async def print_b(message: types.Message):
 
 	await bot.send_message(message.chat.id, final_msg)
 
+#############################
 
-# Нереализованная функция
-# @dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
-# async def msg_request_interval(message: types.Message, state: FSMContext):
-# 	await bot.send_message(message.chat.id, "Введите интервал запросов ")
-# 	await state.set_state(CS.SET_TIME)
+@dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
+async def msg_request_interval(message: types.Message, state: FSMContext):
+	await bot.send_message(message.chat.id, "Введите интервал запросов")
+	await state.set_state(CS.SET_TIME)
 
 
-# # Нереализованная функция
-# @dp.message_handler(state=CS.SET_TIME)
-# async def set_request_interval(message: types.Message, state: FSMContext):
-# 	delay = int(message.text)
-# 	if 60 > delay > 0:
-# 		Main.set_time(delay)
-# 		await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
-# 		await state.set_state(CS.AVAILABLE)
+@dp.message_handler(state=CS.SET_TIME)
+async def set_request_interval(message: types.Message, state: FSMContext):
+	msg = message.text
+	try:
+		delay = int(msg)
+	except ValueError as err:
+		print(err)
+		await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay}")
+	else:
+		if max_delay > delay > min_delay:
+			global current_delay #TODO
+			# Записываем значение в глобальную переменную. 
+			current_delay = delay
+			await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
+			await state.set_state(CS.AVAILABLE)
+		else:
+			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay}")
 
 async def send_to_user(param):
 	vacancy_name_emoji = "🎫"
@@ -386,11 +400,12 @@ async def background_task():
 		for all_param in parsing.get_param_for_msg():
 			await send_to_user(all_param) 
 		
-		await asyncio.sleep(10)
+		# Так как время обновлений отсчитывается в минутах, а asyncio.sleep() принимает только в секундах. Умножаем полученное значение на 60
+		await asyncio.sleep(current_delay * 60)
 
 async def on_startup(dp):
-    # Запускаем фоновую задачу при старте бота
-    asyncio.create_task(background_task())
+	# Запускаем фоновую задачу при старте бота
+	asyncio.create_task(background_task())
 
 if __name__ == "__main__":
 	executor.start_polling(dp, on_startup=on_startup, skip_updates=True)
