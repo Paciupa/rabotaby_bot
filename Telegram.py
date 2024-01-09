@@ -38,7 +38,7 @@ class CS(StatesGroup):
 	STATE_T2 = State()
 	STATE_B1 = State()
 	STATE_B2 = State()
-	SET_TIME = State()
+	REQUEST_DELAY = State()
 
 
 min_delay = 0
@@ -65,6 +65,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
 @dp.message_handler(commands=['help'], state=CS.AVAILABLE)
 async def command_help(message: types.Message):
 	await bot.send_message(message.chat.id, """
+	Общие настройки
+	/update_time - Установить время обновления вакансий (в минутах)
+
 	Шаблоны поиска
 	/add_t Добавить шаблон поиска
 	/del_t Удалить шаблон поиска
@@ -347,13 +350,13 @@ async def print_b(message: types.Message):
 
 #############################
 
-@dp.message_handler(commands=['set_time'], state=CS.AVAILABLE)
+@dp.message_handler(commands=['update_time'], state=CS.AVAILABLE)
 async def msg_request_interval(message: types.Message, state: FSMContext):
-	await bot.send_message(message.chat.id, "Введите интервал запросов")
-	await state.set_state(CS.SET_TIME)
+	await bot.send_message(message.chat.id, "Введите время обновления вакансий (в минутах)")
+	await state.set_state(CS.REQUEST_DELAY)
 
 
-@dp.message_handler(state=CS.SET_TIME)
+@dp.message_handler(state=CS.REQUEST_DELAY)
 async def set_request_interval(message: types.Message, state: FSMContext):
 	msg = message.text
 	try:
@@ -366,7 +369,7 @@ async def set_request_interval(message: types.Message, state: FSMContext):
 			global current_delay #TODO
 			# Записываем значение в глобальную переменную. 
 			current_delay = delay
-			await bot.send_message(message.chat.id, """✅ Новый интервал установлен """)
+			await bot.send_message(message.chat.id, """✅ Время обновления вакансий успешно изменено!""")
 			await state.set_state(CS.AVAILABLE)
 		else:
 			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay}")
