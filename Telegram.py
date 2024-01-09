@@ -39,6 +39,7 @@ class CS(StatesGroup):
 	STATE_B1 = State()
 	STATE_B2 = State()
 	UPDATE_TIME = State()
+	CLEAR_VISITS = State()
 
 
 min_delay = 0
@@ -67,6 +68,7 @@ async def command_help(message: types.Message):
 	await bot.send_message(message.chat.id, """
 	Общие настройки
 	/update_time - Установить время обновления вакансий (в минутах)
+	/clear_visits - Установить время очистки списка посещений (в часах)
 
 	Шаблоны поиска
 	/add_t Добавить шаблон поиска
@@ -372,6 +374,33 @@ async def set_update_time(message: types.Message, state: FSMContext):
 			await state.set_state(CS.AVAILABLE)
 		else:
 			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
+
+
+@dp.message_handler(commands=['clear_visits'], state=CS.AVAILABLE)
+async def msg_clear_visits(message: types.Message, state: FSMContext):
+	await bot.send_message(message.chat.id, "Введите время очистки списка посещений (в часах)\nЧтобы узнать время очистки введите /print_s")
+	await state.set_state(CS.CLEAR_VISITS)
+
+
+@dp.message_handler(state=CS.CLEAR_VISITS)
+async def set_clear_visits(message: types.Message, state: FSMContext):
+	msg = message.text
+	try:
+		hours = int(msg)
+	except ValueError as err:
+		# Если вместо числа принимается команда /print_s, то запускаем функцию print_s, без выполнения остального кода
+		if msg == "/print_s":
+			await print_s(message)
+		else:
+			print(err)
+			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число больше нуля")
+	else:
+		if hours > 0:
+			vl.set_time_clear(hours)
+			await bot.send_message(message.chat.id, """✅ Время очистки списка посещений успешно изменено!""")
+			await state.set_state(CS.AVAILABLE)
+		else:
+			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число больше нуля")
 
 #############################
 # PARSING

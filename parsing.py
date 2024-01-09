@@ -181,12 +181,8 @@ def get_param_for_msg():
 
 	for key, url in keys_and_urls:
 		## Перед всеми проверками и запросами, очищаем список посещений, если есть старые вакансии
-		# Например: если дата посещённой ссылки больше за 1 неделю, то она оттуда удаляется
-		# 1 час = 1
-		# 1 день = 24
-		# 1 неделя = 168
-		# 1 месяц = 4 недели = 672
-		vl.delete_rows_after_time(key, hours=168)
+		# Например: Если дата посещённой ссылки больше за 1 неделю, то она оттуда удаляется
+		vl.delete_rows_after_time(key)
 
 		page = requests.get(url, headers=headers)
 		soup = BeautifulSoup(page.text, "html.parser")

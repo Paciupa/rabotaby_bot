@@ -337,6 +337,12 @@ class VisitsList(Base):
 
 	pattern = "%Y-%m-%d %H:%M:%S"
 
+	# Указываем время в часах
+	# 1 день = 24
+	# 1 неделя = 168
+	# 1 месяц = 4 недели = 672
+	time_clear = 336
+
 	def __init__(self):
 		super().__init__(table_code="VL")
 		self.key = Settings.is_column_present("key")
@@ -355,13 +361,21 @@ class VisitsList(Base):
 		# Создаём новую строку со необходимыми значениями
 		super().create_new_row(self.name_table, current_datetime, key, url)
 
-	def delete_rows_after_time(self, key, hours):
+	@classmethod
+	def get_time_clear(cls):
+		return cls.time_clear
+
+	@classmethod
+	def set_time_clear(cls, hours):
+		cls.time_clear = hours
+
+	def delete_rows_after_time(self, key):
 		"""Удаляем строки по истечении времени с определённым ключом"""
 		# Получаем текущую дату в удобном формате
 		current_datetime = datetime.strptime(self.get_current_datetime(), self.get_pattern())
 
 		# Определяем временной интервал
-		time_threshold = current_datetime - timedelta(hours=hours)
+		time_threshold = current_datetime - timedelta(hours=self.get_time_clear())
 
 		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s", (key, time_threshold))
 
@@ -370,4 +384,3 @@ class VisitsList(Base):
 	def delete_rows_by_key(self, key):
 		"""Удаляем строки по ключу"""
 		super().delete_row_by_value(self.key, key)
-	
