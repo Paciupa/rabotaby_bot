@@ -38,7 +38,7 @@ class CS(StatesGroup):
 	STATE_T2 = State()
 	STATE_B1 = State()
 	STATE_B2 = State()
-	REQUEST_DELAY = State()
+	UPDATE_TIME = State()
 
 
 min_delay = 0
@@ -348,22 +348,21 @@ async def print_b(message: types.Message):
 
 	await bot.send_message(message.chat.id, final_msg)
 
-#############################
 
 @dp.message_handler(commands=['update_time'], state=CS.AVAILABLE)
-async def msg_request_interval(message: types.Message, state: FSMContext):
+async def msg_update_time(message: types.Message, state: FSMContext):
 	await bot.send_message(message.chat.id, "Введите время обновления вакансий (в минутах)")
-	await state.set_state(CS.REQUEST_DELAY)
+	await state.set_state(CS.UPDATE_TIME)
 
 
-@dp.message_handler(state=CS.REQUEST_DELAY)
-async def set_request_interval(message: types.Message, state: FSMContext):
+@dp.message_handler(state=CS.UPDATE_TIME)
+async def set_update_time(message: types.Message, state: FSMContext):
 	msg = message.text
 	try:
 		delay = int(msg)
 	except ValueError as err:
 		print(err)
-		await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay}")
+		await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
 	else:
 		if max_delay > delay > min_delay:
 			global current_delay #TODO
@@ -372,7 +371,10 @@ async def set_request_interval(message: types.Message, state: FSMContext):
 			await bot.send_message(message.chat.id, """✅ Время обновления вакансий успешно изменено!""")
 			await state.set_state(CS.AVAILABLE)
 		else:
-			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay}")
+			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
+
+#############################
+# PARSING
 
 async def send_to_user(param):
 	vacancy_name_emoji = "🎫"
