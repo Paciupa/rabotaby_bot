@@ -69,6 +69,7 @@ async def command_help(message: types.Message):
 	Общие настройки
 	/update_time - Установить время обновления вакансий (в минутах)
 	/clear_visits - Установить время очистки списка посещений (в часах)
+	/print_s - Вывести информацию об общих настройках
 
 	Шаблоны поиска
 	/add_t Добавить шаблон поиска
@@ -353,7 +354,7 @@ async def print_b(message: types.Message):
 
 @dp.message_handler(commands=['update_time'], state=CS.AVAILABLE)
 async def msg_update_time(message: types.Message, state: FSMContext):
-	await bot.send_message(message.chat.id, "Введите время обновления вакансий (в минутах)")
+	await bot.send_message(message.chat.id, "Введите время обновления вакансий (в минутах)\nЧтобы узнать время обновления введите /print_s")
 	await state.set_state(CS.UPDATE_TIME)
 
 
@@ -363,8 +364,12 @@ async def set_update_time(message: types.Message, state: FSMContext):
 	try:
 		delay = int(msg)
 	except ValueError as err:
-		print(err)
-		await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
+		# Если вместо числа принимается команда /print_s, то запускаем функцию print_s, без выполнения остального кода
+		if msg == "/print_s":
+			await print_s(message)
+		else:
+			print(err)
+			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
 	else:
 		if max_delay > delay > min_delay:
 			global current_delay #TODO
@@ -401,6 +406,13 @@ async def set_clear_visits(message: types.Message, state: FSMContext):
 			await state.set_state(CS.AVAILABLE)
 		else:
 			await bot.send_message(message.chat.id, f"❌ Некорректное значение! Введите число больше нуля")
+
+
+@dp.message_handler(commands=['print_s'], state=[
+	CS.AVAILABLE, CS.CLEAR_VISITS, CS.UPDATE_TIME])
+async def print_s(message: types.Message):
+	await bot.send_message(message.chat.id, f"Общие настройки настройки\nВремя обновления вакнсий {current_delay} (в минутах)\nВремя очистки списка посещений {vl.get_time_clear()} (в часах)")
+
 
 #############################
 # PARSING
