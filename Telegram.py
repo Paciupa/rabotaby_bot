@@ -374,6 +374,8 @@ async def send_to_user(param):
 
 	# Удаляем табы из сообщения, так как мешают
 	text_message = text_message.replace("	", "")
+	# Заменяем неразрывные пробелы на обычные
+	text_message = text_message.replace(" ", " ")
 
 	# Используем parse_mode='HTML', так как при Markdown нужно маскировать '(' на '\\('
 	# Это приводит к нарушению работы ссылок в сообщении
