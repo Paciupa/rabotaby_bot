@@ -44,7 +44,7 @@ class CS(StatesGroup):
 
 min_delay = 0
 max_delay = 180
-current_delay = 1
+current_delay = 10
 
 
 async def is_user_ID(message):
