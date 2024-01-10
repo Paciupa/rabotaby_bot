@@ -46,6 +46,7 @@ min_delay = 0
 max_delay = 180
 current_delay = 10
 
+start = False
 
 async def is_user_ID(message):
 	return message.from_user.id == int(user_id)
@@ -57,6 +58,9 @@ async def cmd_start(message: types.Message, state: FSMContext):
 	await asyncio.sleep(0.5)
 	# Только пользователь с допустимым ID сможет получить доступ к боту
 	if await is_user_ID(message):
+		global start
+		start = True
+
 		await bot.send_message(message.chat.id, "🖐 Hola! \nВведите /help для доступа к командам")
 		await state.set_state(CS.AVAILABLE)
 	else:
@@ -443,11 +447,14 @@ async def send_to_user(param):
 
 async def background_task():
 	while True:
-		for all_param in parsing.get_param_for_msg():
-			await send_to_user(all_param) 
-		
-		# Так как время обновлений отсчитывается в минутах, а asyncio.sleep() принимает только в секундах. Умножаем полученное значение на 60
-		await asyncio.sleep(current_delay * 60)
+		if start:
+			for all_param in parsing.get_param_for_msg():
+				await send_to_user(all_param) 
+			
+			# Так как время обновлений отсчитывается в минутах, а asyncio.sleep() принимает только в секундах. Умножаем полученное значение на 60
+			await asyncio.sleep(current_delay * 60)
+		else:
+			await asyncio.sleep(1)
 
 async def on_startup(dp):
 	# Запускаем фоновую задачу при старте бота
