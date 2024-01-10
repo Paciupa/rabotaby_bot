@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 
 from Data import SearchTemplates, BlackList, VisitsList
+import time
 
 st = SearchTemplates()
 bl = BlackList()
@@ -102,8 +103,9 @@ def get_map_url(name_map: str, string_search):
 	return url
 
 def get_vacancy_name(obj):
-	vacancy_name = obj.find("h1", class_="bloko-header-section-1")
-	return vacancy_name.get_text(strip=True)
+	vacancy_name = obj.find("h1", class_="bloko-header-section-1", attrs={"data-qa": "vacancy-title"})
+	if vacancy_name != None:
+		return vacancy_name.get_text(strip=True)
 
 def get_wage(obj):
 	# Есть два варианта получения ЗП
@@ -216,6 +218,11 @@ def get_param_for_msg():
 			for url in all_urls:
 				page2 = requests.get(url, headers=headers)
 				soup2 = BeautifulSoup(page2.text, "html.parser")
+				
+				# TODO
+				# Временное решение проблемы, не полной загрузки страницы
+				# Сделать асинхронный вариант (возможно ли с asyncio.create_task(background_task())?)
+				time.sleep(1.5)
 
 				vacancy_name = get_vacancy_name(soup2)
 				wage = get_wage(soup2)
