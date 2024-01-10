@@ -80,7 +80,6 @@ def get_all_vacancies_on_page(obj):
 			# обрезаем лишнее в адресе
 			url_vacancy = href.split("?")[0]
 			list_url_vacancy.append(url_vacancy)
-	print(list_url_vacancy)
 	return list_url_vacancy
 
 def get_all_vacancies_on_all_pages(url, max_number_pages):
