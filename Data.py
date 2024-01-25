@@ -341,7 +341,7 @@ class VisitsList(Base):
 	# 1 день = 24
 	# 1 неделя = 168
 	# 1 месяц = 4 недели = 672
-	time_clear = 336
+	time_clear = 1344
 
 	def __init__(self):
 		super().__init__(table_code="VL")
