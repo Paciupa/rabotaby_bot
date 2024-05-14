@@ -72,7 +72,7 @@ def get_num_pages(num_vacancies):
 		return int(number_pages)
 
 def get_all_vacancies_on_page(obj):
-	conteiners = obj.findAll('h3', class_='bloko-header-section-3', attrs={"data-qa": "bloko-header-3"})
+	conteiners = obj.findAll('h2', class_='bloko-header-section-2', attrs={"data-qa": "bloko-header-2"})
 	list_url_vacancy = []
 	for conteiner in conteiners:
 		link = conteiner.find('a')
