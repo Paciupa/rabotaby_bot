@@ -287,3 +287,10 @@ per-file-ignores = [
 ]
 max-line-length = 100
 inline-quotes = "double"
+
+
+
+
+
+[tool.pytest.ini_options]
+disable_test_id_escaping_and_forfeit_all_rights_to_community_support = true
