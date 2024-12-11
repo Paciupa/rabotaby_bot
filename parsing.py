@@ -116,9 +116,16 @@ def get_map_url(name_map: str, string_search):
 
 
 def get_vacancy_name(soup):
-	vacancy_name = soup.find("h1", {"data-qa": "vacancy-title"})
-	if vacancy_name is not None:
-		return vacancy_name.get_text(strip=True)
+	# Перебираем несколько возможных атрибутов для имени вакансии
+	selectors = [
+		{"data-qa": "vacancy-title"},
+		{"data-qa": "title"}
+	]
+	
+	for selector in selectors:
+		vacancy_name = soup.find("h1", selector)
+		if vacancy_name is not None:
+			return vacancy_name.get_text(strip=True)
 	return "?"
 
 
