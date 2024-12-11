@@ -437,8 +437,6 @@ async def send_to_user(param):
 	# Заменяем неразрывные пробелы на обычные
 	text_message = text_message.replace("\u00A0", " ")
 
-	await bot.send_message(user_id, text_message)
-
 	# Используем parse_mode='HTML', так как при Markdown нужно маскировать '(' на '\\('
 	# Это приводит к нарушению работы ссылок в сообщении
 	await bot.send_message(user_id, text_message, parse_mode='HTML')
