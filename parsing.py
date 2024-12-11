@@ -17,8 +17,8 @@ basic_url = {
 items_on_page = "&items_on_page=20"
 pages = "&page="
 # чтобы обойти ошибку 404, добавляю заголовок. Как будто запрос делает реальный пользователь
-headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-						 'Chrome/108.0.0.0 Safari/537.36'}
+headers = {"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
+						 "Chrome/108.0.0.0 Safari/537.36"}
 
 
 def get_list_keys_and_templates():
@@ -46,7 +46,7 @@ def get_visit_list():
 
 
 def get_number_vacancies(soup):
-	containers = soup.findAll('h1', {'data-qa': 'title'})
+	containers = soup.findAll("h1", {"data-qa": "title"})
 	try:
 		# Извлекаем текст с числом из контейнера
 		text_string = containers[0].get_text(strip=True)
@@ -59,7 +59,7 @@ def get_number_vacancies(soup):
 	text_string = text_string[:9]
 	try:
 		# Извлекаем число из полученной строки
-		number = int(''.join(filter(str.isdigit, text_string)))
+		number = int("".join(filter(str.isdigit, text_string)))
 		return number
 	except ValueError:
 		# Если числа нет, то возвращаем 0
@@ -80,12 +80,12 @@ def get_num_pages(num_vacancies):
 
 
 def get_all_vacancies_on_page(obj):
-	conteiners = obj.findAll('h2', class_='bloko-header-section-2', attrs={"data-qa": "bloko-header-2"})
+	conteiners = obj.findAll("h2", class_="bloko-header-section-2", attrs={"data-qa": "bloko-header-2"})
 	list_url_vacancy = []
 	for conteiner in conteiners:
-		link = conteiner.find('a')
+		link = conteiner.find("a")
 		if link is not None:
-			href = link['href']
+			href = link["href"]
 			# обрезаем лишнее в адресе
 			url_vacancy = href.split("?")[0]
 			list_url_vacancy.append(url_vacancy)
@@ -146,7 +146,7 @@ def get_name_company(obj):
 	return name_company.get_text() if name_company else "?"
 
 def get_the_rest(obj, name_company):
-	full_address = obj.find('p', attrs={'data-qa': 'vacancy-view-location'})
+	full_address = obj.find("p", attrs={"data-qa": "vacancy-view-location"})
 	if full_address:
 	
 	# # TODO Почему так
@@ -156,7 +156,7 @@ def get_the_rest(obj, name_company):
 		city = full_address.contents[0].strip()
 
 		# Извлекаем станции метро
-		metro_stations = [station.get_text() for station in full_address.find_all('span', class_='metro-station')]
+		metro_stations = [station.get_text() for station in full_address.find_all("span", class_="metro-station")]
 
 		## Извлекаем улицу с домом
 		# Самый простой способ, это собрать все ненужные слова в список. И удалить эти слова из общей строки
@@ -170,7 +170,7 @@ def get_the_rest(obj, name_company):
 		for word in words_to_remove:
 			general_string = general_string.replace(word, "")
 		# Удаляем лишние запятые, и остаётся только улица и дом
-		street_with_house = general_string.strip(', ')
+		street_with_house = general_string.strip(", ")
 
 		if not metro_stations:
 		# Если метро не было указано, то выводим "?"
