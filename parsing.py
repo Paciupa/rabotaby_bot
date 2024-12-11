@@ -114,70 +114,43 @@ def get_map_url(name_map: str, string_search):
 
 
 def get_vacancy_name(obj):
-	vacancy_name = obj.find("h1", class_="bloko-header-section-1", attrs={"data-qa": "vacancy-title"})
+	vacancy_name = obj.find("h1", {"data-qa": "title"})
 	if vacancy_name is not None:
 		return vacancy_name.get_text(strip=True)
 	return "?"
 
 
 def get_wage(obj):
-	wage = obj.find("span", class_="bloko-header-section-2 bloko-header-section-2_lite",
-					attrs={"data-qa": "vacancy-salary"})
-	# Есть два варианта получения ЗП
-	# Вариант 1
-	if wage:
-		return wage.get_text()
-	else:
-		return "?"
+	wage = obj.find("div", {"data-qa": "vacancy-salary"})
+	# Если информация о ЗП не существует во всех вариантах, то выводим "?"
+	return wage.get_text() if wage else "?"
 
-	# Вариант 2
 
 def get_name_company(obj):
-	name_company = obj.find("span", class_="vacancy-company-name")
-	if name_company:
-		return name_company.get_text(strip=True)
-	else:
-		# Если информация о ЗП не существует во всех вариантах, то выводим "?"
-		return "?"
-
-def get_name_company(obj):
-	name_company = obj.find("span", class_="bloko-header-section-2 bloko-header-section-2_lite", attrs={"data-qa": "bloko-header-2"})
+	name_company = obj.find("a", {"data-qa": "vacancy-company-name"})
 	# Если имени компании не существует, то выводим "?"
 	return name_company.get_text() if name_company else "?"
 
 def get_the_rest(obj, name_company):
-	full_address = obj.find("p", attrs={"data-qa": "vacancy-view-location"})
+	full_address = obj.find("div", {"data-qa": "vacancy-address-with-map"})
 	if full_address:
-	
-	# # TODO Почему так
-	# name_company = get_name_company(obj)
+		
+		general_string = full_address.get_text()
 
-	# Если контейнер с адресом существует, тогда разбираем его на город, метро, адрес дома и улицы
-		city = full_address.contents[0].strip()
-
+		# Извлекаем город
+		city = general_string.split(',')[0]
+		
 		# Извлекаем станции метро
-		metro_stations = [station.get_text() for station in full_address.find_all("span", class_="metro-station")]
+		metro_stations = [station.get_text() for station in full_address.find_all("span", {"class": "metro-station"})]
 
-		## Извлекаем улицу с домом
-		# Самый простой способ, это собрать все ненужные слова в список. И удалить эти слова из общей строки
-		# Формируем общую строку
-		general_string = full_address.get_text(strip=True)
-		# Так как отдельный список со всем станциями метро ещё нужен, то содаём копию
-		words_to_remove = metro_stations.copy()
-		# Добавляем в список метро, ещё название города. чтобы удобнее было удалять
-		words_to_remove.append(city)
-		# Удаляем слова из строки
-		for word in words_to_remove:
-			general_string = general_string.replace(word, "")
-		# Удаляем лишние запятые, и остаётся только улица и дом
-		street_with_house = general_string.strip(", ")
+		# Извлекаем улицу с домом
+		street_with_house = ", ".join(general_string.rsplit(", ", 2)[1:])
 
 		if not metro_stations:
 		# Если метро не было указано, то выводим "?"
 			metro_stations = "?"
 
-		# Если переменная(улица и дом) содержит только пробелы, тогда нет смысла искать компанию по адресу
-		if street_with_house.replace(" ", ""):
+		if street_with_house:
 			# Поиск по адресу
 			search_string = f"{city} {street_with_house}"
 			yandex_url = get_map_url("yandex", search_string)
@@ -187,7 +160,7 @@ def get_the_rest(obj, name_company):
 			yandex_url = get_map_url("yandex", name_company)
 			google_url = get_map_url("google", name_company)
 	else:
-		city, street_with_house, metro_stations = "???", "???", "???"
+		city, street_with_house, metro_stations = "???"
 		yandex_url = get_map_url("yandex", name_company)
 		google_url = get_map_url("google", name_company)
 
@@ -250,7 +223,6 @@ async def get_param_for_msg():
 				city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2, name_company)
 				
 				# Так как в названии ключа могут быть пробелы, а как известно пробелы обрезают работу тега в сообщении. Поэтому заменяем все пробелы на нижние подчёркивания
-
 				key_formatted = key.replace(" ", "_")
 
 				if isinstance(metro_stations, list):
