@@ -16,6 +16,7 @@ user_id = int(environ.get('USER_ID'))
 # Подключаемся к боту
 bot = Bot(token=telegram_key, parse_mode='HTML')
 
+# global st, bl, vl, telegram_key, user_id, bot, storage, dp
 st = SearchTemplates()
 bl = BlackList()
 vl = VisitsList()
@@ -137,17 +138,21 @@ async def del_t_input(message: Message, state: FSMContext):
 	try:
 		number_template = int(msg)
 	except ValueError as err:
+		# Если вместо числа принимается команда /print_t, то запускаем функцию print_t, без выполнения остального кода
 		if msg == "/print_t":
 			await print_t(message)
 		else:
+			# Если полученное число неправильное, то выводится сообщение об ошибке
 			print(err)
 			await message.answer("❌ Неверное значение! Укажите число из списка")
 	else:
+		# Если try выполнился, то запускается else (код ниже)
 		if st.get_num_all_rows() >= number_template > 0:
 			key_template = st.get_key_by_number(number_template)
 			# Удаляем записи из списка посещений по ключу шаблона
 			vl.delete_rows_by_key(key_template)
 			# Удаляем сам шаблон поиска. Указываем его номер
+			# Удаляем через номер, так как в боте удобнее писать число, а не целый ключ
 			st.delete_row_by_number(number_template)
 			await message.answer("✅ Номер шаблона успешно удалён!")
 			await state.set_state(CS.AVAILABLE)
@@ -168,13 +173,18 @@ async def state_t_number(message: Message, state: FSMContext):
 	try:
 		number_template = int(msg)
 	except ValueError as err:
+		# Если вместо числа принимается команда /print_t, то запускаем функцию print_t, без выполнения остального кода
 		if msg == "/print_t":
 			await print_t(message)
 		else:
+			# Если полученное число неправильное, то выводится сообщение об ошибке
 			print(err)
 			await message.answer("❌ Неверное значение! Укажите число из списка")
 	else:
+		# Если try выполнился, то запускается else (код ниже)
+		# Если указанное число попадает в существующий диапазон, то переходим в режим установки состояния
 		if st.get_num_all_rows() >= number_template > 0:
+			# Сохраняем значение, чтобы можно было его использовать в другом месте
 			await state.update_data(NUMBER=number_template)
 			await message.answer("2️⃣ Укажите состояние шаблона\nЕсли включить, то 1(один). Если отключить, то 0(ноль)")
 			await state.set_state(CS.STATE_T2)
@@ -184,19 +194,23 @@ async def state_t_number(message: Message, state: FSMContext):
 
 @dp.message(CS.STATE_T2)
 async def state_t_state(message: Message, state: FSMContext):
+	"""Установка нового состояния для шаблона"""
 	msg = message.text
 	try:
 		input_state = int(msg)
+		# Проверяем, чтобы при вводе было значение только 0(ноль) или 1(один)
 		if input_state not in {0, 1}:
 			await message.answer("❌ Неверное состояние! Укажите число 1 или 0")
 			return
 	except ValueError as err:
+		# Если полученное число неправильное, то выводится сообщение об ошибке
 		print(err)
 		await message.answer("❌ Неверное состояние! Укажите число 1 или 0")
 		return
 
 	data = await state.get_data()
 	number_template = data.get("NUMBER")
+		# Извлекаем номер шаблона
 
 	new_state = True if input_state == 1 else False
 	st.set_states_template(number_template, new_state)
@@ -208,6 +222,7 @@ async def state_t_state(message: Message, state: FSMContext):
 async def print_t(message: Message):
 	final_msg = "Список шаблонов\n🟢 - шаблон включен\n🔴 - шаблон выключен\n\n"
 	for line in st.get_all_from_table():
+		# Если шаблон включен(True), то выводим зелёный кружок. А если отключен(False) то выводим красный кружок
 		included = str(line[3])
 		circle = "🟢" if included == "True" else "🔴"
 		final_msg += f"{line[0]}. {circle} {line[1]} - {line[2]}\n"
@@ -256,12 +271,15 @@ async def del_b_input(message: Message, state: FSMContext):
 	try:
 		number_exception = int(msg)
 	except ValueError as err:
+		# Если вместо числа принимается команда /print_b, то запускаем функцию print_b, без выполнения остального кода
 		if msg == "/print_b":
 			await print_b(message)
 		else:
+			# Если полученное число неправильное, то выводится сообщение об ошибке
 			print(err)
 			await message.answer("❌ Неверное значение! Укажите число из чёрного списка")
 	else:
+		# Если try выполнился, то запускается else (код ниже)
 		if bl.get_num_all_rows() >= number_exception > 0:
 			bl.delete_row_by_number(number_exception)
 			await message.answer("✅ Номер исключения успешно удалён!")
@@ -283,13 +301,18 @@ async def state_b_number(message: Message, state: FSMContext):
 	try:
 		number_exception = int(msg)
 	except ValueError as err:
+		# Если вместо числа принимается команда /print_b, то запускаем функцию /print_b, без выполнения остального кода
 		if msg == "/print_b":
 			await print_b(message)
 		else:
+			# Если полученное число неправильное, то выводится сообщение об ошибке
 			print(err)
 			await message.answer("❌ Неверное значение! Укажите число из списка")
 	else:
+		# Если try выполнился, то запускается else (код ниже)
+		# Если указанное число попадает в существующий диапазон, то переходим в режим установки состояния
 		if bl.get_num_all_rows() >= number_exception > 0:
+			# Сохраняем значение, чтобы можно было его использовать в другом месте
 			await state.update_data(NUMBER=number_exception)
 			await message.answer("2️⃣ Укажите состояние исключения\nЕсли включить, то 1(один). Если отключить, то 0(ноль)")
 			await state.set_state(CS.STATE_B2)
@@ -299,19 +322,23 @@ async def state_b_number(message: Message, state: FSMContext):
 
 @dp.message(CS.STATE_B2)
 async def state_b_state(message: Message, state: FSMContext):
+	"""Установка нового состояния для исключения"""
 	msg = message.text
 	try:
 		input_state = int(msg)
+		# Проверяем, чтобы при вводе было значение только 0(ноль) или 1(один)
 		if input_state not in {0, 1}:
 			await message.answer("❌ Неверное состояние! Укажите число 1 или 0")
 			return
 	except ValueError as err:
+		# Если полученное число неправильное, то выводится сообщение об ошибке
 		print(err)
 		await message.answer("❌ Неверное состояние! Укажите число 1 или 0")
 		return
 
 	data = await state.get_data()
 	number_exception = data.get("NUMBER")
+		# Извлекаем номер исключения
 
 	new_state = True if input_state == 1 else False
 	bl.set_states_template(number_exception, new_state)
@@ -323,6 +350,7 @@ async def state_b_state(message: Message, state: FSMContext):
 async def print_b(message: Message):
 	final_msg = "Чёрный список\n🟢 - исключение включено\n🔴 - исключение выключено\n\n"
 	for line in bl.get_all_from_table():
+		# Если исключение включено(True), то выводим зелёный кружок. А если отключено(False) то выводим красный кружок
 		included = str(line[3])
 		circle = "🟢" if included == "True" else "🔴"
 		final_msg += f"{line[0]}. {circle} {line[1]} - {line[2]}\n"
@@ -411,6 +439,9 @@ async def send_to_user(param):
 
 	await bot.send_message(user_id, text_message)
 
+	# Используем parse_mode='HTML', так как при Markdown нужно маскировать '(' на '\\('
+	# Это приводит к нарушению работы ссылок в сообщении
+	await bot.send_message(user_id, text_message, parse_mode='HTML')
 
 async def background_task():
 	while True:
