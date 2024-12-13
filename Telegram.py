@@ -2,6 +2,8 @@ import asyncio
 from os import environ
 
 from aiogram import Bot, Dispatcher, types, F
+from aiogram.client.bot import DefaultBotProperties
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
@@ -13,8 +15,11 @@ import parsing
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
 telegram_key = environ.get('API_TELEGRAM_KEY')
 user_id = int(environ.get('USER_ID'))
+
+# Создание объекта DefaultBotProperties с нужными параметрами
+default_properties = DefaultBotProperties(parse_mode='HTML')
 # Подключаемся к боту
-bot = Bot(token=telegram_key, parse_mode='HTML')
+bot = Bot(token=telegram_key, session=AiohttpSession(timeout=60), default=default_properties)
 
 # global st, bl, vl, telegram_key, user_id, bot, storage, dp
 st = SearchTemplates()
