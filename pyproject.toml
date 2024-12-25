@@ -4,6 +4,7 @@ version = "0.0.0"
 authors = [
   {name = "Anakin"},
 ]
+requires-python = ">=3.9"
 dependencies = [
     "aiogram",
     "beautifulsoup4",
