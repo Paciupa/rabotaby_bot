@@ -8,8 +8,7 @@ requires-python = ">=3.9"
 dependencies = [
     "aiogram",
     "beautifulsoup4",
-    "psycopg",
-    "requests",
+    "psycopg2",
 ]
 
 # [project.optional-dependencies]
