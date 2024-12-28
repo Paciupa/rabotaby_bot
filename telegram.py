@@ -12,7 +12,7 @@ from aiogram.fsm.context import FSMContext
 # Определение класса состояний.
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import Message
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
 
 from data import BlackList, SearchTemplates, VisitsList
 from parsing import get_param_for_msg
@@ -54,8 +54,7 @@ class CS(StatesGroup):
 
 min_delay = 0
 max_delay = 180
-current_delay = 10
-
+current_delay = 1
 start = False
 
 
@@ -465,9 +464,46 @@ async def send_to_user(param):
 	# Заменяем неразрывные пробелы на обычные
 	text_message = text_message.replace("\u00a0", " ")
 
+	keyboard = InlineKeyboardMarkup(row_width=2)
+	buttons = [
+		InlineKeyboardButton(text="✅ Add BL", callback_data='add_to_BL'),
+		InlineKeyboardButton(text="❌ Del BL", callback_data='del_from_BL'),
+	]
+	keyboard.add(*buttons)
+
 	# Используем parse_mode='HTML', так как при Markdown нужно маскировать '(' на '\\('
 	# Это приводит к нарушению работы ссылок в сообщении
-	await bot.send_message(user_id, text_message, parse_mode="HTML")
+	await bot.send_message(user_id, text_message, parse_mode='HTML', reply_markup=keyboard)
+
+
+@dp.callback_query_handler(lambda c: True)
+async def add_to_BL_(callback_query: types.CallbackQuery):
+	await bot.answer_callback_query(callback_query.id)
+	button_text = callback_query.data
+	print("button_text", button_text)
+
+	# Получаем ID сообщения, которое нужно изменить
+	message_id = callback_query.message.message_id
+	print("message_id", message_id)
+
+	print("All_message", callback_query.message)
+	old_text = callback_query.message.text
+	print("old_text", old_text)
+
+	new_text = "Шалом курва\n" + old_text
+	print(new_text)
+
+	await bot.edit_message_text(chat_id=callback_query.from_user.id, message_id=message_id, text=new_text, parse_mode="HTML")
+
+	# await bot.send_message(callback_query.from_user.id, f"Вы выбрали кнопку: {button_text}")
+
+
+# @dp.callback_query_handler(lambda c: c.data in ['del_from_BL'])
+# async def del_from_BL(callback_query: types.CallbackQuery):
+# 	await bot.answer_callback_query(callback_query.id)
+# 	button_text = callback_query.data
+# 	await bot.send_message(callback_query.from_user.id, f"Вы выбрали кнопку: {button_text}")
+
 
 
 async def background_task():
