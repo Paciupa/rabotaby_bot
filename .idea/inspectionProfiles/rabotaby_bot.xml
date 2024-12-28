@@ -1,10 +1,10 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
-    <option name="myName" value="Project Default" />
+    <option name="myName" value="rabotaby_bot" />
     <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="ignoredPackages">
         <value>
-          <list size="15">
+          <list size="17">
             <item index="0" class="java.lang.String" itemvalue="async-timeout" />
             <item index="1" class="java.lang.String" itemvalue="magic-filter" />
             <item index="2" class="java.lang.String" itemvalue="aiogram" />
@@ -20,6 +20,8 @@
             <item index="12" class="java.lang.String" itemvalue="pytz" />
             <item index="13" class="java.lang.String" itemvalue="urllib3" />
             <item index="14" class="java.lang.String" itemvalue="idna" />
+            <item index="15" class="java.lang.String" itemvalue="bs4" />
+            <item index="16" class="java.lang.String" itemvalue="aiosignal" />
           </list>
         </value>
       </option>
@@ -32,6 +34,5 @@
       </option>
     </inspection_tool>
     <inspection_tool class="RuffInspection" enabled="true" level="INFORMATION" enabled_by_default="true" editorAttributes="INFORMATION_ATTRIBUTES" />
-    <inspection_tool class="insyncwithfoo.ryecharm.ruff.linting.RuffInspection" enabled="true" level="WARNING" enabled_by_default="true" editorAttributes="WARNING_ATTRIBUTES" />
   </profile>
 </component>
