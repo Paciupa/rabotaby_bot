@@ -11,16 +11,13 @@ class Settings:
 	It interacts with environment variables to retrieve connection parameters and provides methods for table and column management.
 
 	Example Usage:
-	print(Settings.get_query("BL"))
-	print(Settings.get_table_name_by_code("gf"))
-	print(Settings.get_name_database())
-	Settings.set_name_database("database")
-	print(Settings.get_name_database())
-	print(Settings.is_column_present("BL"))
+	>>> Settings.get_name_database()
+	>>> Settings.get_table_name_by_code("BL")
+	>>> Settings.get_query("BL")
+	>>> Settings.is_column_present("url")
 
-	print(Settings.get_db_connection_parameters())
-	print(Settings.get_db_connection_parameters(True))
-	print(Settings.get_db_connection_parameters())
+	>>> Settings.get_db_connection_parameters()
+	>>> Settings.get_db_connection_parameters(without_database=True)
 	"""  # noqa: D400, D415
 
 	# Подключение к базе данных
