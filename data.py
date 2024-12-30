@@ -119,7 +119,7 @@ class Settings:
 		try:
 			# Делаем тестовый запрос
 			_ = cls.__database_structure[table_code]
-			# Если такой табличный код существует, то возвращаем его для дальнейших взаимодействий 
+			# Если такой табличный код существует, то возвращаем его для дальнейших взаимодействий
 			return table_code
 		except KeyError:
 			print(f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}")
@@ -153,7 +153,7 @@ class Settings:
 
 		# Создаём запрос
 		# Отделяем параметры запятыми и помещаем в скобки
-		# Пример результата: 
+		# Пример результата:
 		# "CREATE TABLE IF NOT EXISTS BlackList (number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL)"
 		query = f"{full_header} ({', '.join(list_all_parameters)})"
 
@@ -320,7 +320,7 @@ class SearchTemplates(Base):
 	def get_key_by_number(self, number_template):
 		"""Получить ключ зная номер шаблона"""
 		self.cursor.execute(
-			f"SELECT {self.key} FROM {self.name_table} WHERE {self.number} = %s;", 
+			f"SELECT {self.key} FROM {self.name_table} WHERE {self.number} = %s;",
 			(number_template,)
 		)
 		return self.cursor.fetchone()[0]
