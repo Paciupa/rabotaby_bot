@@ -432,12 +432,12 @@ async def send_to_user(param):
 	address_emoji = "🌍"
 
 	# Формируем сообщение
-	text_message = f"""#{param['key']}
-{vacancy_name_emoji} <a href="{param['url']}">{param['vacancy_name']}</a>
-{wage_emoji} {param['wage']}
-{name_company_emoji} {param['name_company']}
-{metro_emoji} {param['metro']}
-{address_emoji} {param['city']}, {param['street']} (<a href="{param['yandex_url']}">YandexMap</a>, <a href="{param['google_url']}">GoogleMap</a>)"""
+	text_message = f"""#{param["key"]}
+{vacancy_name_emoji} <a href="{param["url"]}">{param["vacancy_name"]}</a>
+{wage_emoji} {param["wage"]}
+{name_company_emoji} {param["name_company"]}
+{metro_emoji} {param["metro"]}
+{address_emoji} {param["city"]}, {param["street"]} (<a href="{param["yandex_url"]}">YandexMap</a>, <a href="{param["google_url"]}">GoogleMap</a>)"""
 
 	# Удаляем табы из сообщения, так как мешают
 	text_message = text_message.replace("\t", "")
