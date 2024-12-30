@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 # Почитать ID в базах данных (уникальные значения)
 
 class Settings:
-	""" Example:
+	"""Example:
 	print(Settings.get_query("BL"))
 	print(Settings.get_table_name_by_code("gf"))
 	print(Settings.get_name_database())
@@ -79,7 +79,7 @@ class Settings:
 
 	@classmethod
 	def get_db_connection_parameters(cls, without_database=False):
-		"""	Получить словарь с параметрами для создания/подключения базы данных.
+		"""Получить словарь с параметрами для создания/подключения базы данных.
 
 		Если without_database=True, то словарь вернётся без параметра db_name
 		"""
@@ -95,7 +95,7 @@ class Settings:
 
 	@classmethod
 	def get_list_codes_tables(cls):
-		"""Получить список всех кодов для имён таблиц. """
+		"""Получить список всех кодов для имён таблиц."""
 		return list(cls.__database_structure.keys())
 
 	@classmethod
