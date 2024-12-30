@@ -161,7 +161,7 @@ class Settings:
 		return query
 
 
-class Base():
+class Base:
 	""" """
 
 	def __init__(self, table_code):
