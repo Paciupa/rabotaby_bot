@@ -74,7 +74,9 @@ async def cmd_start(message: Message, state: FSMContext):
 		await message.answer("🖐 Hola! \nВведите /help для доступа к командам")
 		await state.set_state(CS.AVAILABLE)
 	else:
-		await message.answer("❌  Please leave this chat. You're an unregistered user\nПрошу покинуть этот чат. Вы незарегистрированный пользователь")
+		await message.answer(
+			"❌  Please leave this chat. You're an unregistered user\nПрошу покинуть этот чат. Вы незарегистрированный пользователь"
+		)
 
 
 @dp.message(Command("help"), CS.AVAILABLE)
@@ -192,7 +194,9 @@ async def state_t_number(message: Message, state: FSMContext):
 		if st.get_num_all_rows() >= number_template > 0:
 			# Сохраняем значение, чтобы можно было его использовать в другом месте
 			await state.update_data(NUMBER=number_template)
-			await message.answer("2️⃣ Укажите состояние шаблона\nЕсли включить, то 1(один). Если отключить, то 0(ноль)")
+			await message.answer(
+				"2️⃣ Укажите состояние шаблона\nЕсли включить, то 1(один). Если отключить, то 0(ноль)"
+			)
 			await state.set_state(CS.STATE_T2)
 		else:
 			await message.answer("❌ Такой номер в базе отсутствует. Введите корректный!")
@@ -266,7 +270,9 @@ async def add_b_url(message: Message, state: FSMContext):
 
 @dp.message(Command("del_b"), CS.AVAILABLE)
 async def del_b_msg(message: Message, state: FSMContext):
-	await message.answer("Укажите номер исключения для удаления.\nЧтобы узнать номер введите /print_b")
+	await message.answer(
+		"Укажите номер исключения для удаления.\nЧтобы узнать номер введите /print_b"
+	)
 	await state.set_state(CS.DEL_B)
 
 
@@ -320,7 +326,9 @@ async def state_b_number(message: Message, state: FSMContext):
 		if bl.get_num_all_rows() >= number_exception > 0:
 			# Сохраняем значение, чтобы можно было его использовать в другом месте
 			await state.update_data(NUMBER=number_exception)
-			await message.answer("2️⃣ Укажите состояние исключения\nЕсли включить, то 1(один). Если отключить, то 0(ноль)")
+			await message.answer(
+				"2️⃣ Укажите состояние исключения\nЕсли включить, то 1(один). Если отключить, то 0(ноль)"
+			)
 			await state.set_state(CS.STATE_B2)
 		else:
 			await message.answer("❌ Такой номер в базе отсутствует. Введите корректный!")
@@ -366,7 +374,9 @@ async def print_b(message: Message):
 
 @dp.message(Command("update_time"), CS.AVAILABLE)
 async def msg_update_time(message: Message, state: FSMContext):
-	await message.answer(f"Введите время обновления вакансий (в минутах, от {min_delay + 1} до {max_delay})\nЧтобы узнать текущее время обновления, введите /print_s")
+	await message.answer(
+		f"Введите время обновления вакансий (в минутах, от {min_delay + 1} до {max_delay})\nЧтобы узнать текущее время обновления, введите /print_s"
+	)
 	await state.set_state(CS.UPDATE_TIME)
 
 
@@ -381,18 +391,24 @@ async def set_update_time(message: Message, state: FSMContext):
 			await message.answer("✅ Время обновления вакансий успешно изменено!")
 			await state.set_state(CS.AVAILABLE)
 		else:
-			await message.answer(f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
+			await message.answer(
+				f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут"
+			)
 	except ValueError as err:
 		if msg == "/print_s":
 			await print_s(message)
 		else:
 			print(err)
-			await message.answer(f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
+			await message.answer(
+				f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут"
+			)
 
 
 @dp.message(Command("clear_visits"), CS.AVAILABLE)
 async def msg_clear_visits(message: Message, state: FSMContext):
-	await message.answer("Введите время очистки списка посещений (в часах, больше 0)\nЧтобы узнать текущее время очистки, введите /print_s")
+	await message.answer(
+		"Введите время очистки списка посещений (в часах, больше 0)\nЧтобы узнать текущее время очистки, введите /print_s"
+	)
 	await state.set_state(CS.CLEAR_VISITS)
 
 
@@ -417,7 +433,9 @@ async def set_clear_visits(message: Message, state: FSMContext):
 
 @dp.message(Command("print_s"), CS.AVAILABLE)
 async def print_s(message: Message):
-	await message.answer(f"Общие настройки\nВремя обновления вакансий: {current_delay} минут\nВремя очистки списка посещений: {vl.get_time_clear()} часов")
+	await message.answer(
+		f"Общие настройки\nВремя обновления вакансий: {current_delay} минут\nВремя очистки списка посещений: {vl.get_time_clear()} часов"
+	)
 
 
 #############################

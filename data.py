@@ -104,7 +104,9 @@ class Settings:
 	def is_column_present(cls, name_column):
 		"""Проверяет, существует ли указанный столбец в таблицах."""
 		# Извлекаем из текущего класса, все переменные (пары ключ-значения). И оставляем только кортежи
-		tuple_used_names = tuple(value for key, value in vars(cls).items() if isinstance(value, tuple))
+		tuple_used_names = tuple(
+			value for key, value in vars(cls).items() if isinstance(value, tuple)
+		)
 		# Извлекаем из кортежей имена таблиц, и записываем в список
 		list_all_names_collums = list([name for name, _ in tuple_used_names])
 
@@ -113,7 +115,9 @@ class Settings:
 			# передаём дальше значение, если всё хорошо
 			return name_column
 		else:
-			print(f"Некорретное имя стобца => {name_column}. Введите один из доступных => {list_all_names_collums}")
+			print(
+				f"Некорретное имя стобца => {name_column}. Введите один из доступных => {list_all_names_collums}"
+			)
 
 	@classmethod
 	def __check_table_code(cls, table_code):
@@ -124,7 +128,9 @@ class Settings:
 			# Если такой табличный код существует, то возвращаем его для дальнейших взаимодействий
 			return table_code
 		except KeyError:
-			print(f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}")
+			print(
+				f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}"
+			)
 
 	@classmethod
 	def __get_setting_for_parameter(cls, table_code):
@@ -167,7 +173,9 @@ class Base:
 
 	def __init__(self, table_code):
 		self.all_parameters = Settings.get_db_connection_parameters()
-		self.parameters_without_database = Settings.get_db_connection_parameters(without_database=True)
+		self.parameters_without_database = Settings.get_db_connection_parameters(
+			without_database=True
+		)
 		self.db_name = Settings.get_name_database()
 
 		self.table_code = table_code
@@ -380,7 +388,10 @@ class VisitsList(Base):
 		# Определяем временной интервал
 		time_threshold = current_datetime - timedelta(hours=self.get_time_clear())
 
-		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s", (key, time_threshold))
+		self.cursor.execute(
+			f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s",
+			(key, time_threshold),
+		)
 
 		self.saving_changes()
 

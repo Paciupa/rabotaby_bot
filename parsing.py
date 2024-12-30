@@ -80,7 +80,9 @@ def get_num_pages(num_vacancies):
 
 
 def get_all_vacancies_on_page(soup):
-	containers = soup.findAll("h2", class_="bloko-header-section-2", attrs={"data-qa": "bloko-header-2"})
+	containers = soup.findAll(
+		"h2", class_="bloko-header-section-2", attrs={"data-qa": "bloko-header-2"}
+	)
 	list_url_vacancy = []
 	for container in containers:
 		link = container.find("a")
@@ -116,10 +118,7 @@ def get_map_url(name_map: str, string_search):
 
 def get_vacancy_name(soup):
 	# Перебираем несколько возможных атрибутов для имени вакансии
-	selectors = [
-		{"data-qa": "vacancy-title"},
-		{"data-qa": "title"},
-	]
+	selectors = [{"data-qa": "vacancy-title"}, {"data-qa": "title"}]
 
 	for selector in selectors:
 		vacancy_name = soup.find("h1", selector)
@@ -149,7 +148,10 @@ def get_the_rest(soup, name_company):
 		city = general_string.split(",")[0]
 
 		# Извлекаем станции метро
-		metro_stations = [station.get_text() for station in full_address.find_all("span", {"class": "metro-station"})]
+		metro_stations = [
+			station.get_text()
+			for station in full_address.find_all("span", {"class": "metro-station"})
+		]
 
 		# Извлекаем улицу с домом
 		street_with_house = ", ".join(general_string.rsplit(", ", 2)[1:])
@@ -227,7 +229,9 @@ async def get_param_for_msg():
 					wage = get_wage(soup2)
 					name_company = get_name_company(soup2)
 
-					city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2, name_company)
+					city, street, metro_stations, yandex_url, google_url = get_the_rest(
+						soup2, name_company
+					)
 
 					# Так как в названии ключа могут быть пробелы, которые обрезают работу тега в сообщении,
 					# заменяем все пробелы на нижние подчёркивания
