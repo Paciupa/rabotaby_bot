@@ -10,5 +10,5 @@ dist/
 temp/
 *.db
 
-env.ps1
+.env*
 __init__.py
