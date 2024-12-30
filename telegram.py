@@ -8,6 +8,8 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message
+# Определение класса состояний.
+from aiogram.fsm.state import State, StatesGroup
 
 from data import SearchTemplates, BlackList, VisitsList
 import parsing
@@ -29,10 +31,6 @@ vl = VisitsList()
 # Инициализируем диспетчер с хранилищем состояний в памяти
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
-
-
-# Определение класса состояний.
-from aiogram.fsm.state import State, StatesGroup
 
 
 class CS(StatesGroup):
