@@ -1,7 +1,7 @@
 import asyncio
 from os import environ
 
-from aiogram import Bot, Dispatcher, F, types
+from aiogram import Bot, Dispatcher
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.filters import Command
