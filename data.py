@@ -9,16 +9,16 @@ from datetime import datetime, timedelta
 
 class Settings:
 	""" Example:
-		print(Settings.get_query("BL"))
-		print(Settings.get_table_name_by_code("gf"))
-		print(Settings.get_name_database())
-		Settings.set_name_database("database")
-		print(Settings.get_name_database())
-		print(Settings.is_column_present("BL"))
+	print(Settings.get_query("BL"))
+	print(Settings.get_table_name_by_code("gf"))
+	print(Settings.get_name_database())
+	Settings.set_name_database("database")
+	print(Settings.get_name_database())
+	print(Settings.is_column_present("BL"))
 
-		print(Settings.get_db_connection_parameters())
-		print(Settings.get_db_connection_parameters(True))
-		print(Settings.get_db_connection_parameters())
+	print(Settings.get_db_connection_parameters())
+	print(Settings.get_db_connection_parameters(True))
+	print(Settings.get_db_connection_parameters())
 	"""
 
 	# Подключение к базе данных
@@ -81,7 +81,7 @@ class Settings:
 	def get_db_connection_parameters(cls, without_database=False):
 		"""	Получить словарь с параметрами для создания/подключения базы данных.
 
-			Если without_database=True, то словарь вернётся без параметра db_name
+		Если without_database=True, то словарь вернётся без параметра db_name
 		"""
 		if without_database:
 			# Создаём копию, чтобы не модифицировать основной словарь
@@ -306,8 +306,8 @@ class SearchTemplates(Base):
 	def set_states_template(self, number, new_state):
 		"""Презаписываем текущее состояние шаблона/исключения на новое. Допускается лишь True/False.
 
-			Если True - то шаблон/исключение используется в поиске
-			Если False - то шаблон/исключение не используется в поиске
+		Если True - то шаблон/исключение используется в поиске
+		Если False - то шаблон/исключение не используется в поиске
 		"""
 
 		self.cursor.execute(
