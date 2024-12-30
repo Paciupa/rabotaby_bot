@@ -1,19 +1,19 @@
 import asyncio
 from os import environ
 
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher, F, types
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import Message
 
 # Определение класса состояний.
 from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.types import Message
 
-from data import SearchTemplates, BlackList, VisitsList
 import parsing
+from data import BlackList, SearchTemplates, VisitsList
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
 telegram_key = environ.get("API_TELEGRAM_KEY")

@@ -1,8 +1,9 @@
 import asyncio
+
 import aiohttp
 from bs4 import BeautifulSoup
 
-from data import SearchTemplates, BlackList, VisitsList
+from data import BlackList, SearchTemplates, VisitsList
 
 st = SearchTemplates()
 bl = BlackList()

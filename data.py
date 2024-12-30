@@ -1,8 +1,8 @@
 # import threading
-import psycopg2
-from os import environ
 from datetime import datetime, timedelta
+from os import environ
 
+import psycopg2
 
 # TODO
 # Почитать ID в базах данных (уникальные значения)
