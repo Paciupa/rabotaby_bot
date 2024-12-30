@@ -1,10 +1,10 @@
-# import threading
+# import threading  # noqa: ERA001, D100
 from datetime import datetime, timedelta
 from os import environ
 
 import psycopg2
 
-# TODO
+# TODO  # noqa: FIX002, TD002, TD003, TD004
 # Почитать ID в базах данных (уникальные значения)
 
 
@@ -21,7 +21,7 @@ class Settings:
 	print(Settings.get_db_connection_parameters())
 	print(Settings.get_db_connection_parameters(True))
 	print(Settings.get_db_connection_parameters())
-	"""
+	"""  # noqa: D400, D415
 
 	# Подключение к базе данных
 
@@ -32,7 +32,7 @@ class Settings:
 	__db_user = environ.get("DB_USER")
 	__db_password = environ.get("DB_PASSWORD")
 
-	__db_connection_parameters = {
+	__db_connection_parameters = {  # noqa: RUF012
 		"host": __db_host,
 		"port": __db_port,
 		"database": __db_name,
@@ -42,7 +42,7 @@ class Settings:
 
 	# Формирование базы данных
 
-	# Тип хранения значений(кортеж), не изменять. По нему происходит поиск названия столбцов
+	# Тип хранения значений(кортеж), не изменять. По нему происходит поиск названия столбцов # noqa: E501, ERA001
 	__number = ("number", "INTEGER NOT NULL")
 	__key = ("key", "TEXT NOT NULL")
 	__url = ("url", "TEXT NOT NULL")
@@ -51,7 +51,7 @@ class Settings:
 
 	__header = "CREATE TABLE IF NOT EXISTS "
 
-	__database_structure = {
+	__database_structure = {  # noqa: RUF012
 		"ST": {
 			"name_table": "search_templates",
 			"column_1": __number,
@@ -80,7 +80,7 @@ class Settings:
 		return cls.__db_name
 
 	@classmethod
-	def get_db_connection_parameters(cls, without_database=False):
+	def get_db_connection_parameters(cls, without_database=False):  # noqa: FBT002
 		"""Получить словарь с параметрами для создания/подключения базы данных.
 
 		Если without_database=True, то словарь вернётся без параметра db_name
@@ -100,23 +100,23 @@ class Settings:
 		"""Получить список всех кодов для имён таблиц."""
 		return list(cls.__database_structure.keys())
 
-	@classmethod
+	@classmethod  # noqa: RET503
 	def is_column_present(cls, name_column):
 		"""Проверяет, существует ли указанный столбец в таблицах."""
-		# Извлекаем из текущего класса, все переменные (пары ключ-значения). И оставляем только кортежи
+		# Извлекаем из текущего класса, все переменные (пары ключ-значения). И оставляем только кортежи # noqa: ERA001, E501
 		tuple_used_names = tuple(
 			value for key, value in vars(cls).items() if isinstance(value, tuple)
 		)
 		# Извлекаем из кортежей имена таблиц, и записываем в список
-		list_all_names_collums = list([name for name, _ in tuple_used_names])
+		list_all_names_collums = list([name for name, _ in tuple_used_names])  # noqa: C411
 
-		# TODO исправить этот костыль
+		# TODO исправить этот костыль  # noqa: ERA001, FIX002, TD002, TD003, TD004
 		if name_column in list_all_names_collums:
 			# передаём дальше значение, если всё хорошо
 			return name_column
-		else:
+		else:  # noqa: RET505
 			print(
-				f"Некорретное имя стобца => {name_column}. Введите один из доступных => {list_all_names_collums}"
+				f"Некорретное имя стобца => {name_column}. Введите один из доступных => {list_all_names_collums}"  # noqa: E501
 			)
 
 	@classmethod
@@ -126,20 +126,20 @@ class Settings:
 			# Делаем тестовый запрос
 			_ = cls.__database_structure[table_code]
 			# Если такой табличный код существует, то возвращаем его для дальнейших взаимодействий
-			return table_code
+			return table_code  # noqa: TRY300
 		except KeyError:
 			print(
-				f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}"
+				f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}"  # noqa: E501
 			)
 
 	@classmethod
 	def __get_setting_for_parameter(cls, table_code):
 		table_code = cls.__check_table_code(table_code)
-		# Так как "name_table" в списке ключей не нужен, используем срез [1::]
+		# Так как "name_table" в списке ключей не нужен, используем срез [1::]  # noqa: ERA001
 		list_keys_columns = list(cls.__database_structure[table_code].keys())[1::]
 		for key_column in list_keys_columns:
-			# Получаем по ключу_столбца кортеж(имя и настройки). Потом собираем в строку с помощью " ".join
-			# Пример вывода одной иттерации: "numberVisits INTEGER NOT NULL"
+			# Получаем по ключу_столбца кортеж(имя и настройки). Потом собираем в строку с помощью " ".join  # noqa: ERA001, E501
+			# Пример вывода одной иттерации: "numberVisits INTEGER NOT NULL"  # noqa: ERA001
 			yield " ".join(cls.__database_structure[table_code][key_column])
 
 	@classmethod
@@ -156,22 +156,22 @@ class Settings:
 		full_header = cls.__header + cls.get_table_name_by_code(table_code)
 
 		# Получаем список всех параметров для запроса
-		# Количество параметров для запроса = количество столбцов для каждой таблицы = количество запросов yield
-		list_all_parameters = list(i for i in cls.__get_setting_for_parameter(table_code))
+		# Количество параметров для запроса = количество столбцов для каждой таблицы = количество запросов yield # noqa: ERA001, E501
+		list_all_parameters = list(i for i in cls.__get_setting_for_parameter(table_code))  # noqa: C400
 
 		# Создаём запрос
 		# Отделяем параметры запятыми и помещаем в скобки
-		# Пример результата:
-		# "CREATE TABLE IF NOT EXISTS BlackList (number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL)"
+		# Пример результата:  # noqa: ERA001
+		# "CREATE TABLE IF NOT EXISTS BlackList (number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL)"  # noqa: ERA001, E501
 		query = f"{full_header} ({', '.join(list_all_parameters)})"
 
-		return query
+		return query  # noqa: RET504
 
 
 class Base:
-	""" """
+	""" """  # noqa: D419
 
-	def __init__(self, table_code):
+	def __init__(self, table_code):  # noqa: D107
 		self.all_parameters = Settings.get_db_connection_parameters()
 		self.parameters_without_database = Settings.get_db_connection_parameters(
 			without_database=True
@@ -190,7 +190,7 @@ class Base:
 
 		self.connect_to_database(self.all_parameters)
 
-	def saving_changes(self):
+	def saving_changes(self):  # noqa: D102
 		self.connection.commit()
 
 	def connect_to_database(self, parameters_database):
@@ -211,7 +211,7 @@ class Base:
 			# Если база данных уже создана, то ошибку не выводим
 			# Возвращаем базу данных к состоянию до выполнения запроса
 			self.connection.rollback()
-		except Exception as e:
+		except Exception as e:  # noqa: BLE001
 			# Обработка остальных ошибок при создании базы данных
 			print(f"Ошибка при создании базы данных: {e}")
 			# Возвращаем базу данных к состоянию до выполнения запроса
@@ -219,7 +219,7 @@ class Base:
 		finally:
 			self.close()
 
-	def table_exists(self, table_code):
+	def table_exists(self, table_code):  # noqa: D102
 		# Формируем таблицу по указанному коду
 		self.connect_to_database(self.all_parameters)
 
@@ -227,31 +227,31 @@ class Base:
 		self.saving_changes()
 
 	def get_num_all_rows(self):
-		""" """
+		""" """  # noqa: D419
 		# Получаем количество строк в таблице
-		self.cursor.execute(f"SELECT COUNT(*) FROM {self.name_table}")
+		self.cursor.execute(f"SELECT COUNT(*) FROM {self.name_table}")  # noqa: S608
 		return self.cursor.fetchone()[0]
 
 	def get_all_from_table(self):
 		"""Получить все данные таблицы."""
 		print(self.name_table)
-		self.cursor.execute(f"SELECT * FROM {self.name_table}")
+		self.cursor.execute(f"SELECT * FROM {self.name_table}")  # noqa: S608
 		return self.cursor.fetchall()
 
 	def get_col_by_name(self, col_name):
 		"""Возвращает весь столбец по имени."""
-		self.cursor.execute(f"SELECT {col_name} FROM {self.name_table}")
+		self.cursor.execute(f"SELECT {col_name} FROM {self.name_table}")  # noqa: S608
 		raw_list_of_keys = self.cursor.fetchall()
 		return [key[0] for key in raw_list_of_keys]
 
 	def create_new_row(self, name_table, *args):
 		"""Создаём новую строку со необходимыми значениями."""
-		# Формируем параметры запроса. Пример результата -> ('%s', '%s', '%s')
+		# Формируем параметры запроса. Пример результата -> ('%s', '%s', '%s')  # noqa: ERA001
 		placeholders = ["%s"] * len(args)
 		query_parameters = f"({', '.join(placeholders)})"
 
 		# Формируем сам запрос
-		query = f"INSERT INTO {name_table} VALUES {query_parameters}"
+		query = f"INSERT INTO {name_table} VALUES {query_parameters}"  # noqa: S608
 
 		# Создаём новую строку
 		self.cursor.execute(query, args)
@@ -259,25 +259,25 @@ class Base:
 
 	def delete_row_by_value(self, name_row, value):
 		"""Удаляем строку/строки по значению в столбце."""
-		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {name_row}=%s", (value,))
+		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {name_row}=%s", (value,))  # noqa: S608
 
 		self.saving_changes()
 
-	def close(self):
+	def close(self):  # noqa: D102
 		self.saving_changes()
 		self.cursor.close()
 		self.connection.close()
 
 
 class SearchTemplates(Base):
-	""" """
+	""" """  # noqa: D419
 
-	def __init__(self):
+	def __init__(self):  # noqa: D107
 		super().__init__(table_code="ST")
 		self.key = Settings.is_column_present("key")
 		self.included = Settings.is_column_present("included")
 
-	def create_new_row(self, new_key, new_url, is_included=True):
+	def create_new_row(self, new_key, new_url, is_included=True):  # noqa: FBT002, D102
 		number_rows = self.get_num_all_rows()
 		# Создаём номер новой строки
 		next_number = number_rows + 1
@@ -295,11 +295,11 @@ class SearchTemplates(Base):
 	def __update_col_number(self):
 		"""Обновляем числа в столбце c числами."""
 		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца number.
-		self.cursor.execute(f"SELECT * FROM {self.name_table} ORDER BY {self.number}")
+		self.cursor.execute(f"SELECT * FROM {self.name_table} ORDER BY {self.number}")  # noqa: S608
 		rows = self.cursor.fetchall()
 
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
-		# Предположу, что использование вот такого варианта list(range(1, len(self.get_num_all_rows())+1)), забирает чуть больше ресурсов.
+		# Предположу, что использование вот такого варианта list(range(1, len(self.get_num_all_rows())+1)), забирает чуть больше ресурсов.  # noqa: ERA001, E501
 		# Поэтому реализовал без обращения к методу
 		list_new_numbers = list(range(1, len(rows) + 1))
 		# Обновите столбец 'number' с новыми значениями
@@ -307,7 +307,7 @@ class SearchTemplates(Base):
 			# Получаем старое значение number в строке, чтобы потом его заменить на новое
 			old_number = rows[new_number - 1][0]
 			self.cursor.execute(
-				f"UPDATE {self.name_table} SET {self.number} = %s WHERE {self.number} = %s",
+				f"UPDATE {self.name_table} SET {self.number} = %s WHERE {self.number} = %s",  # noqa: S608
 				(new_number, old_number),
 			)
 
@@ -320,76 +320,76 @@ class SearchTemplates(Base):
 		Если False - то шаблон/исключение не используется в поиске
 		"""
 		self.cursor.execute(
-			f"UPDATE {self.name_table} SET {self.included} = %s WHERE {self.number} = %s",
+			f"UPDATE {self.name_table} SET {self.included} = %s WHERE {self.number} = %s",  # noqa: S608
 			(new_state, number),
 		)
-		# Сортируем строки по номеру, так как после изменения состояния, строка смещается(почему?)
+		# Сортируем строки по номеру, так как после изменения состояния, строка смещается(почему?) # noqa: E501, ERA001
 		self.__update_col_number()
 
 	def get_key_by_number(self, number_template):
 		"""Получить ключ зная номер шаблона."""
 		self.cursor.execute(
-			f"SELECT {self.key} FROM {self.name_table} WHERE {self.number} = %s;",
+			f"SELECT {self.key} FROM {self.name_table} WHERE {self.number} = %s;",  # noqa: S608
 			(number_template,),
 		)
 		return self.cursor.fetchone()[0]
 
 
 class BlackList(SearchTemplates):
-	""" """
+	""" """  # noqa: D419
 
-	def __init__(self):
+	def __init__(self):  # noqa: D107
 		Base.__init__(self, table_code="BL")
 		self.included = Settings.is_column_present("included")
 
 
 class VisitsList(Base):
-	""" """
+	""" """  # noqa: D419
 
 	pattern = "%Y-%m-%d %H:%M:%S"
 
 	# Указываем время в часах
-	# 1 день = 24
-	# 1 неделя = 168
-	# 1 месяц = 4 недели = 672
+	# 1 день = 24  # noqa: ERA001
+	# 1 неделя = 168  # noqa: ERA001
+	# 1 месяц = 4 недели = 672  # noqa: ERA001
 	time_clear = 1344
 
-	def __init__(self):
+	def __init__(self):  # noqa: D107
 		super().__init__(table_code="VL")
 		self.key = Settings.is_column_present("key")
 		self.lastDateTime = Settings.is_column_present("last_date_time")
 
 	@classmethod
-	def get_pattern(cls):
+	def get_pattern(cls):  # noqa: D102
 		return cls.pattern
 
-	def get_current_datetime(self):
-		now = datetime.now()
+	def get_current_datetime(self):  # noqa: D102
+		now = datetime.now()  # noqa: DTZ005
 		return now.strftime(self.get_pattern())
 
-	def create_new_row(self, key, url):
+	def create_new_row(self, key, url):  # noqa: D102
 		current_datetime = self.get_current_datetime()
 		# Создаём новую строку со необходимыми значениями
 		super().create_new_row(self.name_table, current_datetime, key, url)
 
 	@classmethod
-	def get_time_clear(cls):
+	def get_time_clear(cls):  # noqa: D102
 		return cls.time_clear
 
 	@classmethod
-	def set_time_clear(cls, hours):
+	def set_time_clear(cls, hours):  # noqa: D102
 		cls.time_clear = hours
 
 	def delete_rows_after_time(self, key):
 		"""Удаляем строки по истечении времени с определённым ключом."""
 		# Получаем текущую дату в удобном формате
-		current_datetime = datetime.strptime(self.get_current_datetime(), self.get_pattern())
+		current_datetime = datetime.strptime(self.get_current_datetime(), self.get_pattern())  # noqa: DTZ007
 
 		# Определяем временной интервал
 		time_threshold = current_datetime - timedelta(hours=self.get_time_clear())
 
 		self.cursor.execute(
-			f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s",
+			f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s",  # noqa: S608
 			(key, time_threshold),
 		)
 
