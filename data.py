@@ -58,20 +58,20 @@ class Settings:
 			"column_2": __key,
 			"column_3": __url,
 			"column_4": __included,
-			},
+		},
 		"BL": {
 			"name_table": "black_list",
 			"column_1": __number,
 			"column_2": __key,
 			"column_3": __url,
 			"column_4": __included,
-			},
+		},
 		"VL": {
 			"name_table": "visits_list",
 			"column_1": __lastDateTime,
 			"column_2": __key,
 			"column_3": __url,
-			},
+		},
 	}
 
 	@classmethod
