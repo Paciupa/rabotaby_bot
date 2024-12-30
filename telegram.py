@@ -198,7 +198,7 @@ async def state_t_number(message: Message, state: FSMContext):
 
 @dp.message(CS.STATE_T2)
 async def state_t_state(message: Message, state: FSMContext):
-	"""Установка нового состояния для шаблона"""
+	"""Установка нового состояния для шаблона."""
 	msg = message.text
 	try:
 		input_state = int(msg)
@@ -326,7 +326,7 @@ async def state_b_number(message: Message, state: FSMContext):
 
 @dp.message(CS.STATE_B2)
 async def state_b_state(message: Message, state: FSMContext):
-	"""Установка нового состояния для исключения"""
+	"""Установка нового состояния для исключения."""
 	msg = message.text
 	try:
 		input_state = int(msg)
