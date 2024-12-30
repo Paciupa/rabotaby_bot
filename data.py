@@ -309,7 +309,6 @@ class SearchTemplates(Base):
 		Если True - то шаблон/исключение используется в поиске
 		Если False - то шаблон/исключение не используется в поиске
 		"""
-
 		self.cursor.execute(
 			f"UPDATE {self.name_table} SET {self.included} = %s WHERE {self.number} = %s",
 			(new_state, number),
