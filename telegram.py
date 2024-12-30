@@ -8,6 +8,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message
+
 # Определение класса состояний.
 from aiogram.fsm.state import State, StatesGroup
 
@@ -58,6 +59,7 @@ start = False
 
 async def is_user_ID(message: Message):
 	return message.from_user.id == user_id
+
 
 # TODO Удалить повторяющийся код. Оптимизировать функции
 
@@ -420,6 +422,7 @@ async def print_s(message: Message):
 
 #############################
 # PARSING
+
 
 async def send_to_user(param):
 	vacancy_name_emoji = "🎫"

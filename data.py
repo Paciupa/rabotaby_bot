@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 # TODO
 # Почитать ID в базах данных (уникальные значения)
 
+
 class Settings:
 	"""Example:
 
