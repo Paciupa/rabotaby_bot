@@ -146,54 +146,6 @@ ignore = [
 
 
     # stale:
-
-    # # Invalid module name [4]
-    # "N999",
-    # # Probable use of requests call without timeout [1]
-    # "S113",
-    # # Loop control variable `it` not used within loop body [1]
-    # "B007",
-    # # Missing docstring in public package [1]
-    # "D104",
-    # # Method `get_current_datetime` could be a function, class method, or static method [1]
-    # "PLR6301",
-    # # Use explicit conversion flag [1]
-    # "RUF010",
-
-    # # whitespace-before-punctuation [19]
-    # "E203",
-    # # over-indentation [12]
-    # "D208",
-    # # bad-quotes-inline-string [11]
-    # "Q000",
-    # # blank-line-with-whitespace [8]
-    # "W293",
-    # # multiple-leading-hashes-for-block-comment [6]
-    # "E266",
-    # # trailing-whitespace [4]
-    # "W291",
-    # # unsorted-imports [3]
-    # "I001",
-    # # surrounding-whitespace [3]
-    # "D210",
-    # # unexpected-indentation-comment [2]
-    # "E116",
-    # # blank-lines-top-level [2]
-    # "E302",
-    # # missing-newline-at-end-of-file [2]
-    # "W292",
-    # # unused-import [2]
-    # "F401",
-    # # mixed-spaces-and-tabs [1]
-    # "E101",
-    # # module-import-not-at-top-of-file [1]
-    # "E402",
-    # # no-blank-line-after-function [1]
-    # "D202",
-    # # blank-line-after-summary [1]
-    # "D205",
-    # # unnecessary-class-parentheses [1]
-    # "UP039",
 ]
 external = [
     "WPS",
