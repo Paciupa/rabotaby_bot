@@ -10,7 +10,7 @@ vl = VisitsList()
 
 basic_url = {
 	"yandex": "https://yandex.com/maps/?text=",
-	"google": "https://www.google.com/maps/place/"
+	"google": "https://www.google.com/maps/place/",
 }
 
 items_on_page = "&items_on_page=20"
@@ -118,7 +118,7 @@ def get_vacancy_name(soup):
 	# Перебираем несколько возможных атрибутов для имени вакансии
 	selectors = [
 		{"data-qa": "vacancy-title"},
-		{"data-qa": "title"}
+		{"data-qa": "title"},
 	]
 
 	for selector in selectors:

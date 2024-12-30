@@ -36,7 +36,7 @@ class Settings:
 		"port": __db_port,
 		"database": __db_name,
 		"user": __db_user,
-		"password": __db_password
+		"password": __db_password,
 	}
 
 	# Формирование базы данных
@@ -56,21 +56,21 @@ class Settings:
 			"column_1": __number,
 			"column_2": __key,
 			"column_3": __url,
-			"column_4": __included
+			"column_4": __included,
 			},
 		"BL": {
 			"name_table": "black_list",
 			"column_1": __number,
 			"column_2": __key,
 			"column_3": __url,
-			"column_4": __included
+			"column_4": __included,
 			},
 		"VL": {
 			"name_table": "visits_list",
 			"column_1": __lastDateTime,
 			"column_2": __key,
-			"column_3": __url
-			}
+			"column_3": __url,
+			},
 	}
 
 	@classmethod
@@ -321,7 +321,7 @@ class SearchTemplates(Base):
 		"""Получить ключ зная номер шаблона."""
 		self.cursor.execute(
 			f"SELECT {self.key} FROM {self.name_table} WHERE {self.number} = %s;",
-			(number_template,)
+			(number_template,),
 		)
 		return self.cursor.fetchone()[0]
 
