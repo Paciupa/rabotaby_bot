@@ -215,7 +215,7 @@ async def state_t_state(message: Message, state: FSMContext):
 
 	data = await state.get_data()
 	number_template = data.get("NUMBER")
-		# Извлекаем номер шаблона
+	# Извлекаем номер шаблона
 
 	new_state = True if input_state == 1 else False
 	st.set_states_template(number_template, new_state)
@@ -343,7 +343,7 @@ async def state_b_state(message: Message, state: FSMContext):
 
 	data = await state.get_data()
 	number_exception = data.get("NUMBER")
-		# Извлекаем номер исключения
+	# Извлекаем номер исключения
 
 	new_state = True if input_state == 1 else False
 	bl.set_states_template(number_exception, new_state)
