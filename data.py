@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 
 class Settings:
 	"""Example:
+
 	print(Settings.get_query("BL"))
 	print(Settings.get_table_name_by_code("gf"))
 	print(Settings.get_name_database())
