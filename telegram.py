@@ -15,11 +15,11 @@ from data import SearchTemplates, BlackList, VisitsList
 import parsing
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
-telegram_key = environ.get('API_TELEGRAM_KEY')
-user_id = int(environ.get('USER_ID'))
+telegram_key = environ.get("API_TELEGRAM_KEY")
+user_id = int(environ.get("USER_ID"))
 
 # Создание объекта DefaultBotProperties с нужными параметрами
-default_properties = DefaultBotProperties(parse_mode='HTML')
+default_properties = DefaultBotProperties(parse_mode="HTML")
 # Подключаемся к боту
 bot = Bot(token=telegram_key, session=AiohttpSession(timeout=60), default=default_properties)
 
@@ -443,7 +443,7 @@ async def send_to_user(param):
 
 	# Используем parse_mode='HTML', так как при Markdown нужно маскировать '(' на '\\('
 	# Это приводит к нарушению работы ссылок в сообщении
-	await bot.send_message(user_id, text_message, parse_mode='HTML')
+	await bot.send_message(user_id, text_message, parse_mode="HTML")
 
 
 async def background_task():

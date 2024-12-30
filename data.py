@@ -24,11 +24,11 @@ class Settings:
 	# Подключение к базе данных
 
 	# Достаём из переменных окружения все необходимые параметры для базы данных
-	__db_host = environ.get('DB_HOST')
-	__db_port = environ.get('DB_PORT')
-	__db_name = environ.get('DB_NAME')
-	__db_user = environ.get('DB_USER')
-	__db_password = environ.get('DB_PASSWORD')
+	__db_host = environ.get("DB_HOST")
+	__db_port = environ.get("DB_PORT")
+	__db_name = environ.get("DB_NAME")
+	__db_user = environ.get("DB_USER")
+	__db_password = environ.get("DB_PASSWORD")
 
 	__db_connection_parameters = {
 		"host": __db_host,
@@ -138,7 +138,7 @@ class Settings:
 	def get_table_name_by_code(cls, table_code):
 		"""Получить имя таблицы по коду"""
 		table_code = cls.__check_table_code(table_code)
-		return cls.__database_structure[table_code]['name_table']
+		return cls.__database_structure[table_code]["name_table"]
 
 	@classmethod
 	def get_query(cls, table_code):

@@ -146,7 +146,7 @@ def get_the_rest(soup, name_company):
 		general_string = full_address.get_text()
 
 		# Извлекаем город
-		city = general_string.split(',')[0]
+		city = general_string.split(",")[0]
 
 		# Извлекаем станции метро
 		metro_stations = [station.get_text() for station in full_address.find_all("span", {"class": "metro-station"})]
