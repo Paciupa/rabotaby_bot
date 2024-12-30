@@ -1,23 +1,26 @@
 import asyncio
 from os import environ
 
-from aiogram import Bot, Dispatcher, types, F
+from aiogram import Bot, Dispatcher
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+
+# Определение класса состояний.
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message
 
-from data import SearchTemplates, BlackList, VisitsList
 import parsing
+from data import BlackList, SearchTemplates, VisitsList
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
-telegram_key = environ.get('API_TELEGRAM_KEY')
-user_id = int(environ.get('USER_ID'))
+telegram_key = environ.get("API_TELEGRAM_KEY")
+user_id = int(environ.get("USER_ID"))
 
 # Создание объекта DefaultBotProperties с нужными параметрами
-default_properties = DefaultBotProperties(parse_mode='HTML')
+default_properties = DefaultBotProperties(parse_mode="HTML")
 # Подключаемся к боту
 bot = Bot(token=telegram_key, session=AiohttpSession(timeout=60), default=default_properties)
 
@@ -29,10 +32,6 @@ vl = VisitsList()
 # Инициализируем диспетчер с хранилищем состояний в памяти
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
-
-
-# Определение класса состояний.
-from aiogram.fsm.state import State, StatesGroup
 
 
 class CS(StatesGroup):
@@ -61,7 +60,9 @@ start = False
 async def is_user_ID(message: Message):
 	return message.from_user.id == user_id
 
+
 # TODO Удалить повторяющийся код. Оптимизировать функции
+
 
 @dp.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
@@ -73,7 +74,9 @@ async def cmd_start(message: Message, state: FSMContext):
 		await message.answer("🖐 Hola! \nВведите /help для доступа к командам")
 		await state.set_state(CS.AVAILABLE)
 	else:
-		await message.answer("❌  Please leave this chat. You're an unregistered user\nПрошу покинуть этот чат. Вы незарегистрированный пользователь")
+		await message.answer(
+			"❌  Please leave this chat. You're an unregistered user\nПрошу покинуть этот чат. Вы незарегистрированный пользователь"
+		)
 
 
 @dp.message(Command("help"), CS.AVAILABLE)
@@ -191,7 +194,9 @@ async def state_t_number(message: Message, state: FSMContext):
 		if st.get_num_all_rows() >= number_template > 0:
 			# Сохраняем значение, чтобы можно было его использовать в другом месте
 			await state.update_data(NUMBER=number_template)
-			await message.answer("2️⃣ Укажите состояние шаблона\nЕсли включить, то 1(один). Если отключить, то 0(ноль)")
+			await message.answer(
+				"2️⃣ Укажите состояние шаблона\nЕсли включить, то 1(один). Если отключить, то 0(ноль)"
+			)
 			await state.set_state(CS.STATE_T2)
 		else:
 			await message.answer("❌ Такой номер в базе отсутствует. Введите корректный!")
@@ -199,7 +204,7 @@ async def state_t_number(message: Message, state: FSMContext):
 
 @dp.message(CS.STATE_T2)
 async def state_t_state(message: Message, state: FSMContext):
-	"""Установка нового состояния для шаблона"""
+	"""Установка нового состояния для шаблона."""
 	msg = message.text
 	try:
 		input_state = int(msg)
@@ -215,7 +220,7 @@ async def state_t_state(message: Message, state: FSMContext):
 
 	data = await state.get_data()
 	number_template = data.get("NUMBER")
-		# Извлекаем номер шаблона
+	# Извлекаем номер шаблона
 
 	new_state = True if input_state == 1 else False
 	st.set_states_template(number_template, new_state)
@@ -265,7 +270,9 @@ async def add_b_url(message: Message, state: FSMContext):
 
 @dp.message(Command("del_b"), CS.AVAILABLE)
 async def del_b_msg(message: Message, state: FSMContext):
-	await message.answer("Укажите номер исключения для удаления.\nЧтобы узнать номер введите /print_b")
+	await message.answer(
+		"Укажите номер исключения для удаления.\nЧтобы узнать номер введите /print_b"
+	)
 	await state.set_state(CS.DEL_B)
 
 
@@ -319,7 +326,9 @@ async def state_b_number(message: Message, state: FSMContext):
 		if bl.get_num_all_rows() >= number_exception > 0:
 			# Сохраняем значение, чтобы можно было его использовать в другом месте
 			await state.update_data(NUMBER=number_exception)
-			await message.answer("2️⃣ Укажите состояние исключения\nЕсли включить, то 1(один). Если отключить, то 0(ноль)")
+			await message.answer(
+				"2️⃣ Укажите состояние исключения\nЕсли включить, то 1(один). Если отключить, то 0(ноль)"
+			)
 			await state.set_state(CS.STATE_B2)
 		else:
 			await message.answer("❌ Такой номер в базе отсутствует. Введите корректный!")
@@ -327,7 +336,7 @@ async def state_b_number(message: Message, state: FSMContext):
 
 @dp.message(CS.STATE_B2)
 async def state_b_state(message: Message, state: FSMContext):
-	"""Установка нового состояния для исключения"""
+	"""Установка нового состояния для исключения."""
 	msg = message.text
 	try:
 		input_state = int(msg)
@@ -343,7 +352,7 @@ async def state_b_state(message: Message, state: FSMContext):
 
 	data = await state.get_data()
 	number_exception = data.get("NUMBER")
-		# Извлекаем номер исключения
+	# Извлекаем номер исключения
 
 	new_state = True if input_state == 1 else False
 	bl.set_states_template(number_exception, new_state)
@@ -365,7 +374,9 @@ async def print_b(message: Message):
 
 @dp.message(Command("update_time"), CS.AVAILABLE)
 async def msg_update_time(message: Message, state: FSMContext):
-	await message.answer(f"Введите время обновления вакансий (в минутах, от {min_delay + 1} до {max_delay})\nЧтобы узнать текущее время обновления, введите /print_s")
+	await message.answer(
+		f"Введите время обновления вакансий (в минутах, от {min_delay + 1} до {max_delay})\nЧтобы узнать текущее время обновления, введите /print_s"
+	)
 	await state.set_state(CS.UPDATE_TIME)
 
 
@@ -380,18 +391,24 @@ async def set_update_time(message: Message, state: FSMContext):
 			await message.answer("✅ Время обновления вакансий успешно изменено!")
 			await state.set_state(CS.AVAILABLE)
 		else:
-			await message.answer(f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
+			await message.answer(
+				f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут"
+			)
 	except ValueError as err:
 		if msg == "/print_s":
 			await print_s(message)
 		else:
 			print(err)
-			await message.answer(f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут")
+			await message.answer(
+				f"❌ Некорректное значение! Введите число от {min_delay + 1} до {max_delay} минут"
+			)
 
 
 @dp.message(Command("clear_visits"), CS.AVAILABLE)
 async def msg_clear_visits(message: Message, state: FSMContext):
-	await message.answer("Введите время очистки списка посещений (в часах, больше 0)\nЧтобы узнать текущее время очистки, введите /print_s")
+	await message.answer(
+		"Введите время очистки списка посещений (в часах, больше 0)\nЧтобы узнать текущее время очистки, введите /print_s"
+	)
 	await state.set_state(CS.CLEAR_VISITS)
 
 
@@ -416,11 +433,14 @@ async def set_clear_visits(message: Message, state: FSMContext):
 
 @dp.message(Command("print_s"), CS.AVAILABLE)
 async def print_s(message: Message):
-	await message.answer(f"Общие настройки\nВремя обновления вакансий: {current_delay} минут\nВремя очистки списка посещений: {vl.get_time_clear()} часов")
+	await message.answer(
+		f"Общие настройки\nВремя обновления вакансий: {current_delay} минут\nВремя очистки списка посещений: {vl.get_time_clear()} часов"
+	)
 
 
 #############################
 # PARSING
+
 
 async def send_to_user(param):
 	vacancy_name_emoji = "🎫"
@@ -430,21 +450,22 @@ async def send_to_user(param):
 	address_emoji = "🌍"
 
 	# Формируем сообщение
-	text_message = f"""#{param['key']}
-{vacancy_name_emoji} <a href="{param['url']}">{param['vacancy_name']}</a>
-{wage_emoji} {param['wage']}
-{name_company_emoji} {param['name_company']}
-{metro_emoji} {param['metro']}
-{address_emoji} {param['city']}, {param['street']} (<a href="{param['yandex_url']}">YandexMap</a>, <a href="{param['google_url']}">GoogleMap</a>)"""
+	text_message = f"""#{param["key"]}
+{vacancy_name_emoji} <a href="{param["url"]}">{param["vacancy_name"]}</a>
+{wage_emoji} {param["wage"]}
+{name_company_emoji} {param["name_company"]}
+{metro_emoji} {param["metro"]}
+{address_emoji} {param["city"]}, {param["street"]} (<a href="{param["yandex_url"]}">YandexMap</a>, <a href="{param["google_url"]}">GoogleMap</a>)"""
 
 	# Удаляем табы из сообщения, так как мешают
 	text_message = text_message.replace("\t", "")
 	# Заменяем неразрывные пробелы на обычные
-	text_message = text_message.replace("\u00A0", " ")
+	text_message = text_message.replace("\u00a0", " ")
 
 	# Используем parse_mode='HTML', так как при Markdown нужно маскировать '(' на '\\('
 	# Это приводит к нарушению работы ссылок в сообщении
-	await bot.send_message(user_id, text_message, parse_mode='HTML')
+	await bot.send_message(user_id, text_message, parse_mode="HTML")
+
 
 async def background_task():
 	while True:

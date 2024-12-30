@@ -1,8 +1,9 @@
 import asyncio
+
 import aiohttp
 from bs4 import BeautifulSoup
 
-from data import SearchTemplates, BlackList, VisitsList
+from data import BlackList, SearchTemplates, VisitsList
 
 st = SearchTemplates()
 bl = BlackList()
@@ -10,15 +11,14 @@ vl = VisitsList()
 
 basic_url = {
 	"yandex": "https://yandex.com/maps/?text=",
-	"google": "https://www.google.com/maps/place/"
+	"google": "https://www.google.com/maps/place/",
 }
 
 items_on_page = "&items_on_page=20"
 pages = "&page="
 # Чтобы обойти ошибку 404, добавляем заголовок. Как будто запрос делает реальный пользователь
 headers = {
-	"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) "
-				  "Chrome/108.0.0.0 Safari/537.36"
+	"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
 }
 
 
@@ -81,7 +81,9 @@ def get_num_pages(num_vacancies):
 
 
 def get_all_vacancies_on_page(soup):
-	containers = soup.findAll("h2", class_="bloko-header-section-2", attrs={"data-qa": "bloko-header-2"})
+	containers = soup.findAll(
+		"h2", class_="bloko-header-section-2", attrs={"data-qa": "bloko-header-2"}
+	)
 	list_url_vacancy = []
 	for container in containers:
 		link = container.find("a")
@@ -104,7 +106,7 @@ async def get_all_vacancies_on_all_pages(session, url, max_number_pages):
 	return all_vacancies
 
 
-######################### Работа со страницами вакансий
+# Работа со страницами вакансий
 def get_map_url(name_map: str, string_search):
 	# Удаляем все запятые из строки
 	string_without_commas = string_search.replace(",", "")
@@ -117,11 +119,8 @@ def get_map_url(name_map: str, string_search):
 
 def get_vacancy_name(soup):
 	# Перебираем несколько возможных атрибутов для имени вакансии
-	selectors = [
-		{"data-qa": "vacancy-title"},
-		{"data-qa": "title"}
-	]
-	
+	selectors = [{"data-qa": "vacancy-title"}, {"data-qa": "title"}]
+
 	for selector in selectors:
 		vacancy_name = soup.find("h1", selector)
 		if vacancy_name is not None:
@@ -147,10 +146,13 @@ def get_the_rest(soup, name_company):
 		general_string = full_address.get_text()
 
 		# Извлекаем город
-		city = general_string.split(',')[0]
+		city = general_string.split(",")[0]
 
 		# Извлекаем станции метро
-		metro_stations = [station.get_text() for station in full_address.find_all("span", {"class": "metro-station"})]
+		metro_stations = [
+			station.get_text()
+			for station in full_address.find_all("span", {"class": "metro-station"})
+		]
 
 		# Извлекаем улицу с домом
 		street_with_house = ", ".join(general_string.rsplit(", ", 2)[1:])
@@ -176,8 +178,7 @@ def get_the_rest(soup, name_company):
 	return city, street_with_house, metro_stations, yandex_url, google_url
 
 
-######################### Работа со страницами вакансий
-
+# Работа со страницами вакансий
 async def get_param_for_msg():
 	keys_and_urls = get_list_keys_and_templates()
 
@@ -229,7 +230,9 @@ async def get_param_for_msg():
 					wage = get_wage(soup2)
 					name_company = get_name_company(soup2)
 
-					city, street, metro_stations, yandex_url, google_url = get_the_rest(soup2, name_company)
+					city, street, metro_stations, yandex_url, google_url = get_the_rest(
+						soup2, name_company
+					)
 
 					# Так как в названии ключа могут быть пробелы, которые обрезают работу тега в сообщении,
 					# заменяем все пробелы на нижние подчёркивания
