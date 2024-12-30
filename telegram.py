@@ -63,6 +63,7 @@ async def is_user_ID(message: Message):
 
 # TODO Удалить повторяющийся код. Оптимизировать функции
 
+
 @dp.message(Command("start"))
 async def cmd_start(message: Message, state: FSMContext):
 	# Только пользователь с допустимым ID сможет получить доступ к боту
@@ -445,6 +446,7 @@ async def send_to_user(param):
 	# Используем parse_mode='HTML', так как при Markdown нужно маскировать '(' на '\\('
 	# Это приводит к нарушению работы ссылок в сообщении
 	await bot.send_message(user_id, text_message, parse_mode='HTML')
+
 
 async def background_task():
 	while True:
