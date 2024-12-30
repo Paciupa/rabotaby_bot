@@ -30,11 +30,11 @@ class Settings:
 	__db_password = environ.get('DB_PASSWORD')
 
 	__db_connection_parameters = {
-		"host" : __db_host,
-		"port" : __db_port,
-		"database" : __db_name,
-		"user" : __db_user,
-		"password" : __db_password
+		"host": __db_host,
+		"port": __db_port,
+		"database": __db_name,
+		"user": __db_user,
+		"password": __db_password
 	}
 
 	## Формирование базы данных
@@ -49,24 +49,24 @@ class Settings:
 
 	__database_structure = {
 		"ST": {
-			"name_table" : "search_templates",
-			"column_1" : __number,
-			"column_2" : __key,
-			"column_3" : __url,
-			"column_4" : __included
+			"name_table": "search_templates",
+			"column_1": __number,
+			"column_2": __key,
+			"column_3": __url,
+			"column_4": __included
 			},
 		"BL": {
-			"name_table" : "black_list",
-			"column_1" : __number,
-			"column_2" : __key,
-			"column_3" : __url,
-			"column_4" : __included
+			"name_table": "black_list",
+			"column_1": __number,
+			"column_2": __key,
+			"column_3": __url,
+			"column_4": __included
 			},
 		"VL": {
-			"name_table" : "visits_list",
-			"column_1" : __lastDateTime,
-			"column_2" : __key,
-			"column_3" : __url
+			"name_table": "visits_list",
+			"column_1": __lastDateTime,
+			"column_2": __key,
+			"column_3": __url
 			}
 	}
 
