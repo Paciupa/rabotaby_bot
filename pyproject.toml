@@ -77,38 +77,20 @@ ignore = [
 
     # figure out what to do:
 
-    # # line-too-long [53]
-    # "E501",
     # # undocumented-public-function [40]
     # "D103",
     # # commented-out-code [29]
     # "ERA001",
-    # # ends-in-period [22]
-    # "D400",
-    # # ends-in-punctuation [22]
-    # "D415",
-    # # whitespace-before-punctuation [19]
-    # "E203",
-    # # over-indentation [12]
-    # "D208",
-    # # bad-quotes-inline-string [11]
-    # "Q000",
+    # # line-too-long [25]
+    # "E501",
     # # hardcoded-sql-expression [10]
     # "S608",
-    # # missing-trailing-comma [9]
-    # "COM812",
     # # undocumented-public-method [9]
     # "D102",
-    # # blank-line-with-whitespace [8]
-    # "W293",
     # # unnecessary-assign [6]
     # "RET504",
-    # # multiple-leading-hashes-for-block-comment [6]
-    # "E266",
     # # empty-docstring [5]
     # "D419",
-    # # trailing-whitespace [4]
-    # "W291",
     # # undocumented-public-init [4]
     # "D107",
     # # line-contains-todo [3]
@@ -119,26 +101,14 @@ ignore = [
     # "TD003",
     # # missing-todo-colon [3]
     # "TD004",
-    # # unsorted-imports [3]
-    # "I001",
     # # undocumented-public-module [3]
     # "D100",
-    # # surrounding-whitespace [3]
-    # "D210",
     # # boolean-default-value-positional-argument [2]
     # "FBT002",
     # # superfluous-else-return [2]
     # "RET505",
     # # if-expr-with-true-false [2]
     # "SIM210",
-    # # unexpected-indentation-comment [2]
-    # "E116",
-    # # blank-lines-top-level [2]
-    # "E302",
-    # # missing-newline-at-end-of-file [2]
-    # "W292",
-    # # unused-import [2]
-    # "F401",
     # # global-statement [2]
     # "PLW0603",
     # # mutable-class-default [2]
@@ -161,20 +131,14 @@ ignore = [
     # "TD005",
     # # invalid-function-name [1]
     # "N802",
-    # # mixed-spaces-and-tabs [1]
-    # "E101",
-    # # module-import-not-at-top-of-file [1]
-    # "E402",
     # # undocumented-public-class [1]
     # "D101",
-    # # no-blank-line-after-function [1]
-    # "D202",
-    # # blank-line-after-summary [1]
-    # "D205",
+    # # ends-in-period [1]
+    # "D400",
+    # # ends-in-punctuation [1]
+    # "D415",
     # # too-many-locals [1]
     # "PLR0914",
-    # # unnecessary-class-parentheses [1]
-    # "UP039",
     # # asyncio-dangling-task [1]
     # "RUF006",
     # # unused-async [1]
@@ -195,6 +159,41 @@ ignore = [
     # "PLR6301",
     # # Use explicit conversion flag [1]
     # "RUF010",
+
+    # # whitespace-before-punctuation [19]
+    # "E203",
+    # # over-indentation [12]
+    # "D208",
+    # # bad-quotes-inline-string [11]
+    # "Q000",
+    # # blank-line-with-whitespace [8]
+    # "W293",
+    # # multiple-leading-hashes-for-block-comment [6]
+    # "E266",
+    # # trailing-whitespace [4]
+    # "W291",
+    # # unsorted-imports [3]
+    # "I001",
+    # # surrounding-whitespace [3]
+    # "D210",
+    # # unexpected-indentation-comment [2]
+    # "E116",
+    # # blank-lines-top-level [2]
+    # "E302",
+    # # missing-newline-at-end-of-file [2]
+    # "W292",
+    # # unused-import [2]
+    # "F401",
+    # # mixed-spaces-and-tabs [1]
+    # "E101",
+    # # module-import-not-at-top-of-file [1]
+    # "E402",
+    # # no-blank-line-after-function [1]
+    # "D202",
+    # # blank-line-after-summary [1]
+    # "D205",
+    # # unnecessary-class-parentheses [1]
+    # "UP039",
 ]
 external = [
     "WPS",
