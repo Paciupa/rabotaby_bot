@@ -6,8 +6,11 @@ import psycopg2
 
 
 class Settings:
-	"""Example:
+	"""
+	A class for managing database connection settings and constructing SQL queries for table creation.
+	It interacts with environment variables to retrieve connection parameters and provides methods for table and column management.
 
+	Example Usage:
 	print(Settings.get_query("BL"))
 	print(Settings.get_table_name_by_code("gf"))
 	print(Settings.get_name_database())
@@ -73,34 +76,69 @@ class Settings:
 
 	@classmethod
 	def get_name_database(cls):
-		"""Получить имя файла базы данных."""
+		"""
+		Returns the name of the database file.
+
+		Example:
+			print(Settings.get_name_database())
+
+		Returns:
+			str: The name of the database as set in the environment variable `DB_NAME`.
+		"""
 		return cls.__db_name
 
 	@classmethod
 	def get_db_connection_parameters(cls, without_database=False):  # noqa: FBT002
-		"""Получить словарь с параметрами для создания/подключения базы данных.
+		"""
+		Returns a dictionary of database connection parameters, optionally excluding the database name.
 
-		Если without_database=True, то словарь вернётся без параметра db_name
+		Args:
+			without_database (bool): If True, excludes the database name from the connection parameters.
+
+		Example:
+			print(Settings.get_db_connection_parameters())
+			print(Settings.get_db_connection_parameters(True))
+
+		Returns:
+			dict: A dictionary of database connection parameters, possibly excluding the `database` key.
 		"""
 		if without_database:
-			# Создаём копию, чтобы не модифицировать основной словарь
+			# Creates a copy to avoid modifying the original dictionary
 			copy_db_conn_param = cls.__db_connection_parameters.copy()
-			# Удаляем лишнее
+			# Removes the 'database' parameter if requested
 			del copy_db_conn_param["database"]
-			# Возвращаем копию
 			return copy_db_conn_param
 
 		return cls.__db_connection_parameters
 
 	@classmethod
 	def get_list_codes_tables(cls):
-		"""Получить список всех кодов для имён таблиц."""
+		"""
+		Returns a list of all table codes.
+
+		Example:
+			print(Settings.get_list_codes_tables())
+
+		Returns:
+			list: A list of strings representing the table codes (e.g., ["ST", "BL", "VL"]).
+		"""
 		return list(cls.__database_structure.keys())
 
 	@classmethod  # noqa: RET503
 	def is_column_present(cls, name_column):
-		"""Проверяет, существует ли указанный столбец в таблицах."""
-		# Извлекаем из текущего класса, все переменные (пары ключ-значения). И оставляем только кортежи # noqa: ERA001, E501
+		"""
+		Checks if the specified column name exists in any of the tables.
+
+		Args:
+			name_column (str): The column name to check.
+
+		Example:
+			print(Settings.is_column_present("BL"))
+
+		Returns:
+			str: The column name if it exists in any table, else prints an error message.
+		"""
+		# Extracting column names from all tables
 		tuple_used_names = tuple(
 			value for key, value in vars(cls).items() if isinstance(value, tuple)
 		)
@@ -118,7 +156,19 @@ class Settings:
 
 	@classmethod
 	def __check_table_code(cls, table_code):
-		"""Проверяем, содержится ли введённый код в списке имён таблиц."""
+		"""
+		Verifies if the given table code exists in the database structure.
+
+		Args:
+			table_code (str): The code for the table to check.
+
+		Example:
+			table_code = "BL"
+			print(Settings.__check_table_code(table_code))
+
+		Returns:
+			str: The table code if valid, else prints an error message.
+		"""
 		try:
 			# Делаем тестовый запрос
 			_ = cls.__database_structure[table_code]
@@ -131,6 +181,15 @@ class Settings:
 
 	@classmethod
 	def __get_setting_for_parameter(cls, table_code):
+		"""
+		Yields the SQL column definition for each column in the specified table code.
+
+		Args:
+			table_code (str): The code for the table to get column settings.
+
+		Yields:
+			str: Each column definition as a string (e.g., "number INTEGER NOT NULL").
+		"""
 		table_code = cls.__check_table_code(table_code)
 		# Так как "name_table" в списке ключей не нужен, используем срез [1::]  # noqa: ERA001
 		list_keys_columns = list(cls.__database_structure[table_code].keys())[1::]
@@ -141,13 +200,35 @@ class Settings:
 
 	@classmethod
 	def get_table_name_by_code(cls, table_code):
-		"""Получить имя таблицы по коду."""
+		"""
+		Returns the name of the table corresponding to the given table code.
+
+		Args:
+			table_code (str): The code of the table to fetch the name for.
+
+		Example:
+			print(Settings.get_table_name_by_code("BL"))
+
+		Returns:
+			str: The name of the table (e.g., "black_list").
+		"""
 		table_code = cls.__check_table_code(table_code)
 		return cls.__database_structure[table_code]["name_table"]
 
 	@classmethod
 	def get_query(cls, table_code):
-		"""Получить запрос для создания таблицы."""
+		"""
+		Constructs and returns a SQL query for creating a table based on the table code.
+
+		Args:
+			table_code (str): The code of the table to generate the SQL query for.
+
+		Example:
+			print(Settings.get_query("BL"))
+
+		Returns:
+			str: The SQL query for creating the table.
+		"""
 		table_code = cls.__check_table_code(table_code)
 		# Формируем полную шапку запроса
 		full_header = cls.__header + cls.get_table_name_by_code(table_code)
@@ -160,6 +241,7 @@ class Settings:
 		# Отделяем параметры запятыми и помещаем в скобки
 		# Пример результата:  # noqa: ERA001
 		# "CREATE TABLE IF NOT EXISTS BlackList (number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL)"  # noqa: ERA001, E501
+		# Constructing the full SQL query
 		query = f"{full_header} ({', '.join(list_all_parameters)})"
 
 		return query  # noqa: RET504
