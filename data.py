@@ -21,7 +21,8 @@ class Settings:
 		print(Settings.get_db_connection_parameters())
 	"""
 
-	## Подключение к базе данных
+	# Подключение к базе данных
+
 	# Достаём из переменных окружения все необходимые параметры для базы данных
 	__db_host = environ.get('DB_HOST')
 	__db_port = environ.get('DB_PORT')
@@ -37,8 +38,9 @@ class Settings:
 		"password": __db_password
 	}
 
-	## Формирование базы данных
-	# Тип хранения значений(кортеж), не изменять. По нему происходит поиск названия столбцов 
+	# Формирование базы данных
+
+	# Тип хранения значений(кортеж), не изменять. По нему происходит поиск названия столбцов
 	__number = ("number", "INTEGER NOT NULL")
 	__key = ("key", "TEXT NOT NULL")
 	__url = ("url", "TEXT NOT NULL")
@@ -145,11 +147,11 @@ class Settings:
 		# Формируем полную шапку запроса
 		full_header = cls.__header + cls.get_table_name_by_code(table_code)
 
-		## Получаем список всех параметров для запроса
+		# Получаем список всех параметров для запроса
 		# Количество параметров для запроса = количество столбцов для каждой таблицы = количество запросов yield
 		list_all_parameters = list(i for i in cls.__get_setting_for_parameter(table_code))
 
-		## Создаём запрос
+		# Создаём запрос
 		# Отделяем параметры запятыми и помещаем в скобки
 		# Пример результата: 
 		# "CREATE TABLE IF NOT EXISTS BlackList (number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL)"

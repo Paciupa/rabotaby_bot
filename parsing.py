@@ -104,7 +104,7 @@ async def get_all_vacancies_on_all_pages(session, url, max_number_pages):
 	return all_vacancies
 
 
-######################### Работа со страницами вакансий
+# Работа со страницами вакансий
 def get_map_url(name_map: str, string_search):
 	# Удаляем все запятые из строки
 	string_without_commas = string_search.replace(",", "")
@@ -176,8 +176,7 @@ def get_the_rest(soup, name_company):
 	return city, street_with_house, metro_stations, yandex_url, google_url
 
 
-######################### Работа со страницами вакансий
-
+# Работа со страницами вакансий
 async def get_param_for_msg():
 	keys_and_urls = get_list_keys_and_templates()
 
