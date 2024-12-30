@@ -61,6 +61,8 @@ ignore = [
     "T201",
     # tab-indentation
     "W191",
+    # indent-with-spaces
+    "D206",
     # ambiguous-unicode-character-string
     "RUF001",
     # ambiguous-unicode-character-docstring
@@ -121,8 +123,6 @@ ignore = [
     # "I001",
     # # undocumented-public-module [3]
     # "D100",
-    # # indent-with-spaces [3]
-    "D206",
     # # surrounding-whitespace [3]
     # "D210",
     # # boolean-default-value-positional-argument [2]
