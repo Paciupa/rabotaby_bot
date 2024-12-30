@@ -120,7 +120,7 @@ def get_vacancy_name(soup):
 		{"data-qa": "vacancy-title"},
 		{"data-qa": "title"}
 	]
-	
+
 	for selector in selectors:
 		vacancy_name = soup.find("h1", selector)
 		if vacancy_name is not None:

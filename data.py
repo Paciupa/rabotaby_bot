@@ -105,7 +105,7 @@ class Settings:
 		tuple_used_names = tuple(value for key, value in vars(cls).items() if isinstance(value, tuple))
 		# Извлекаем из кортежей имена таблиц, и записываем в список
 		list_all_names_collums = list([name for name, _ in tuple_used_names])
-		
+
 		# TODO исправить этот костыль
 		if name_column in list_all_names_collums:
 			# передаём дальше значение, если всё хорошо
@@ -171,13 +171,13 @@ class Base():
 		self.table_code = table_code
 		self.name_table = Settings.get_table_name_by_code(self.table_code)
 		self.number = Settings.is_column_present("number")
-		
+
 		# Если базы данных не существует, то создаём её
 		self.database_exists()
 
 		# Если указанной таблицы не существует, то создаём её
 		self.table_exists(self.table_code)
-		
+
 		self.connect_to_database(self.all_parameters)
 
 	def saving_changes(self):
@@ -266,7 +266,7 @@ class SearchTemplates(Base):
 		super().__init__(table_code="ST")
 		self.key = Settings.is_column_present("key")
 		self.included = Settings.is_column_present("included")
-		
+
 	def create_new_row(self, new_key, new_url, is_included=True):
 		number_rows = self.get_num_all_rows()
 		# Создаём номер новой строки
@@ -305,7 +305,7 @@ class SearchTemplates(Base):
 
 	def set_states_template(self, number, new_state):
 		"""Презаписываем текущее состояние шаблона/исключения на новое. Допускается лишь True/False
-		
+
 			Если True - то шаблон/исключение используется в поиске
 			Если False - то шаблон/исключение не используется в поиске
 		"""
@@ -316,7 +316,7 @@ class SearchTemplates(Base):
 		)
 		# Сортируем строки по номеру, так как после изменения состояния, строка смещается(почему?)
 		self.__update_col_number()
-	
+
 	def get_key_by_number(self, number_template):
 		"""Получить ключ зная номер шаблона"""
 		self.cursor.execute(
@@ -382,7 +382,7 @@ class VisitsList(Base):
 		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s", (key, time_threshold))
 
 		self.saving_changes()
-	
+
 	def delete_rows_by_key(self, key):
 		"""Удаляем строки по ключу"""
 		super().delete_row_by_value(self.key, key)
