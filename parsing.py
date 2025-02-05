@@ -141,7 +141,7 @@ def get_name_company(soup):
 
 
 def get_the_rest(soup, name_company):
-	full_address = soup.find("div", {"data-qa": "vacancy-view-raw-address"})
+	full_address = soup.find("span", {"data-qa": "vacancy-view-raw-address"})
 	if full_address:
 		general_string = full_address.get_text()
 
