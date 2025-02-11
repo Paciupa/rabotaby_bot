@@ -1,5 +1,6 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="rabotaby_bot" />
+    <inspection_tool class="insyncwithfoo.ryecharm.ruff.linting.RuffInspection" enabled="true" level="WARNING" enabled_by_default="false" />
   </profile>
 </component>
