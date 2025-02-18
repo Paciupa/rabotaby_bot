@@ -133,9 +133,9 @@ ignore = [
     # "N802",
     # # undocumented-public-class [1]
     # "D101",
-    # # ends-in-period [1]
+    # # missing-trailing-period [1]
     # "D400",
-    # # ends-in-punctuation [1]
+    # # missing-terminal-punctuation [1]
     # "D415",
     # # too-many-locals [1]
     # "PLR0914",
