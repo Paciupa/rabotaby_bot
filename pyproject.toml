@@ -41,8 +41,6 @@ ignore = [
 
     # missing-trailing-comma
     "COM812",
-    # single-line-implicit-string-concatenation
-    "ISC001",
 
 
     # don't check at all:
