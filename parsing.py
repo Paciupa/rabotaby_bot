@@ -60,6 +60,7 @@ def get_number_vacancies(soup):
 	text_string = text_string[:9]
 	try:
 		# Извлекаем число из полученной строки
+		# noinspection PyTypeChecker
 		number = int("".join(filter(str.isdigit, text_string)))
 		return number
 	except ValueError:

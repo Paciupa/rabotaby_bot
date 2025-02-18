@@ -57,6 +57,7 @@ current_delay = 10
 start = False
 
 
+# noinspection PyPep8Naming
 async def is_user_ID(message: Message):
 	return message.from_user.id == user_id
 

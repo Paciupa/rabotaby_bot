@@ -193,6 +193,7 @@ class Base:
 	def saving_changes(self):  # noqa: D102
 		self.connection.commit()
 
+	# noinspection PyAttributeOutsideInit
 	def connect_to_database(self, parameters_database):
 		"""Подключаемся к базе данных."""
 		self.connection = psycopg2.connect(**parameters_database)
@@ -277,6 +278,7 @@ class SearchTemplates(Base):
 		self.key = Settings.is_column_present("key")
 		self.included = Settings.is_column_present("included")
 
+	# noinspection PyMethodOverriding
 	def create_new_row(self, new_key, new_url, is_included=True):  # noqa: FBT002, D102
 		number_rows = self.get_num_all_rows()
 		# Создаём номер новой строки
@@ -367,6 +369,7 @@ class VisitsList(Base):
 		now = datetime.now()  # noqa: DTZ005
 		return now.strftime(self.get_pattern())
 
+	# noinspection PyMethodOverriding
 	def create_new_row(self, key, url):  # noqa: D102
 		current_datetime = self.get_current_datetime()
 		# Создаём новую строку со необходимыми значениями
