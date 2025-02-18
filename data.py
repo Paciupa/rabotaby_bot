@@ -108,15 +108,15 @@ class Settings:
 			value for key, value in vars(cls).items() if isinstance(value, tuple)
 		)
 		# Извлекаем из кортежей имена таблиц, и записываем в список
-		list_all_names_collums = list([name for name, _ in tuple_used_names])  # noqa: C411
+		list_all_names_columns = list([name for name, _ in tuple_used_names])  # noqa: C411
 
 		# TODO исправить этот костыль  # noqa: ERA001, FIX002, TD002, TD003, TD004
-		if name_column in list_all_names_collums:
+		if name_column in list_all_names_columns:
 			# передаём дальше значение, если всё хорошо
 			return name_column
 		else:  # noqa: RET505
 			print(
-				f"Некорретное имя стобца => {name_column}. Введите один из доступных => {list_all_names_collums}"  # noqa: E501
+				f"Некорректное имя столбца => {name_column}. Введите один из доступных => {list_all_names_columns}"  # noqa: E501
 			)
 
 	@classmethod
@@ -139,7 +139,7 @@ class Settings:
 		list_keys_columns = list(cls.__database_structure[table_code].keys())[1::]
 		for key_column in list_keys_columns:
 			# Получаем по ключу_столбца кортеж(имя и настройки). Потом собираем в строку с помощью " ".join  # noqa: ERA001, E501
-			# Пример вывода одной иттерации: "numberVisits INTEGER NOT NULL"  # noqa: ERA001
+			# Пример вывода одной итерации: "numberVisits INTEGER NOT NULL"  # noqa: ERA001
 			yield " ".join(cls.__database_structure[table_code][key_column])
 
 	@classmethod
@@ -209,8 +209,8 @@ class Base:
 			print(f"База данных '{self.db_name}' создана успешно.")
 
 		except psycopg2.errors.DuplicateDatabase:
-			# Если база данных уже создана, то ошибку не выводим
-			# Возвращаем базу данных к состоянию до выполнения запроса
+			# Если база данных уже создана, то ошибку не выводим,
+			# а возвращаем базу данных к состоянию до выполнения запроса
 			self.connection.rollback()
 		except Exception as e:  # noqa: BLE001
 			# Обработка остальных ошибок при создании базы данных
@@ -246,7 +246,7 @@ class Base:
 		return [key[0] for key in raw_list_of_keys]
 
 	def create_new_row(self, name_table, *args):
-		"""Создаём новую строку со необходимыми значениями."""
+		"""Создаём новую строку с необходимыми значениями."""
 		# Формируем параметры запроса. Пример результата -> ('%s', '%s', '%s')  # noqa: ERA001
 		placeholders = ["%s"] * len(args)
 		query_parameters = f"({', '.join(placeholders)})"
@@ -283,7 +283,7 @@ class SearchTemplates(Base):
 		number_rows = self.get_num_all_rows()
 		# Создаём номер новой строки
 		next_number = number_rows + 1
-		# Создаём новую строку со необходимыми значениями
+		# Создаём новую строку с необходимыми значениями
 		super().create_new_row(self.name_table, next_number, new_key, new_url, is_included)
 		self.__update_col_number()
 
@@ -291,11 +291,11 @@ class SearchTemplates(Base):
 		"""Удаляем строку по номеру."""
 		super().delete_row_by_value(self.number, number)
 
-		# обновляем нумерацию в столбце number. Так как при удалении появился разрыв в нумерации
+		# Обновляем нумерацию в столбце number, так как при удалении появился разрыв в нумерации
 		self.__update_col_number()
 
 	def __update_col_number(self):
-		"""Обновляем числа в столбце c числами."""
+		"""Обновляем числа в столбце с числами."""
 		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца number.
 		self.cursor.execute(f"SELECT * FROM {self.name_table} ORDER BY {self.number}")  # noqa: S608
 		rows = self.cursor.fetchall()
@@ -316,8 +316,9 @@ class SearchTemplates(Base):
 		self.saving_changes()
 
 	def set_states_template(self, number, new_state):
-		"""Презаписываем текущее состояние шаблона/исключения на новое. Допускается лишь True/False.
+		"""Перезаписываем текущее состояние шаблона/исключения на новое.
 
+		Допускается лишь True/False.
 		Если True - то шаблон/исключение используется в поиске
 		Если False - то шаблон/исключение не используется в поиске
 		"""
@@ -372,7 +373,7 @@ class VisitsList(Base):
 	# noinspection PyMethodOverriding
 	def create_new_row(self, key, url):  # noqa: D102
 		current_datetime = self.get_current_datetime()
-		# Создаём новую строку со необходимыми значениями
+		# Создаём новую строку с необходимыми значениями
 		super().create_new_row(self.name_table, current_datetime, key, url)
 
 	@classmethod
