@@ -2,15 +2,15 @@
 repos:
 
 # https://docs.astral.sh/ruff/integrations/#pre-commit
-#- repo: https://github.com/astral-sh/ruff-pre-commit
-#  # Ruff version.
-#  rev: v0.8.4
-#  hooks:
-#    # Run the linter.
-#    - id: ruff
-#      args: [ --fix ]
-#    # Run the formatter.
-#    - id: ruff-format
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.9.6
+  hooks:
+    # Run the linter.
+    - id: ruff
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
 
 # https://pylint.pycqa.org/en/stable/user_guide/installation/pre-commit-integration.html
 #- repo: local
@@ -24,7 +24,7 @@ repos:
 
 # https://flake8.pycqa.org/en/latest/user/using-hooks.html
 #- repo: https://github.com/pycqa/flake8
-#  rev: 7.1.1
+#  rev: 7.1.2
 #  hooks:
 #    - id: flake8
 #      additional_dependencies: [Flake8-pyproject]
@@ -32,7 +32,7 @@ repos:
 # Second, for wemake-python-styleguide
 # https://flake8.pycqa.org/en/latest/user/using-hooks.html
 #- repo: https://github.com/pycqa/flake8
-#  rev: 7.1.1
+#  rev: 7.1.2
 #  hooks:
 #    - id: flake8
 #      alias: wemake-python-styleguide

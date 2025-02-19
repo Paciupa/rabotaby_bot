@@ -57,6 +57,7 @@ current_delay = 10
 start = False
 
 
+# noinspection PyPep8Naming
 async def is_user_ID(message: Message):
 	return message.from_user.id == user_id
 
@@ -159,7 +160,7 @@ async def del_t_input(message: Message, state: FSMContext):
 			key_template = st.get_key_by_number(number_template)
 			# Удаляем записи из списка посещений по ключу шаблона
 			vl.delete_rows_by_key(key_template)
-			# Удаляем сам шаблон поиска. Указываем его номер
+			# Удаляем сам шаблон поиска. Указываем его номер.
 			# Удаляем через номер, так как в боте удобнее писать число, а не целый ключ
 			st.delete_row_by_number(number_template)
 			await message.answer("✅ Номер шаблона успешно удалён!")

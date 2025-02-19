@@ -60,6 +60,7 @@ def get_number_vacancies(soup):
 	text_string = text_string[:9]
 	try:
 		# Извлекаем число из полученной строки
+		# noinspection PyTypeChecker
 		number = int("".join(filter(str.isdigit, text_string)))
 		return number
 	except ValueError:
@@ -141,7 +142,7 @@ def get_name_company(soup):
 
 
 def get_the_rest(soup, name_company):
-	full_address = soup.find("div", {"data-qa": "vacancy-view-raw-address"})
+	full_address = soup.find("span", {"data-qa": "vacancy-view-raw-address"})
 	if full_address:
 		general_string = full_address.get_text()
 
@@ -208,8 +209,8 @@ async def get_param_for_msg():
 
 			# Получаем список уже ранее выведенных вакансий (список посещений)
 			visit_list = get_visit_list()
-			# Получаем список URLs, которые ранее не выводились в боте
-			# То есть, удаляем из выдачи те URLs, которые находятся в списке посещений
+			# Получаем список URLs, которые ранее не выводились в боте,
+			# то есть удаляем из выдачи URLs из списка посещений
 			all_urls = list(set(all_urls) - set(visit_list))
 
 			if all_urls:
