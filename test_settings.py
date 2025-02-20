@@ -6,7 +6,7 @@ from data import Settings
 @pytest.mark.parametrize(
 	("method_to_test", "args", "expected_result"),
 	[
-		("get_name_database", (), "test_bot_db"),
+		("get_database_name", (), "test_bot_db"),
 		(
 			"get_db_connection_parameters",
 			(),
