@@ -6,32 +6,15 @@ import psycopg2
 
 
 class Settings:
-	"""Manage bot settings.
+	"""Manage database settings.
 
 	A class for managing database connection settings
-	and constructing SQL queries for table creation (schema).
+	and constructing SQL queries for table creation (database schema).
 	It interacts with environment variables to retrieve connection parameters
 	and provides methods for table and column management.
-
-	Examples:
-	>>> Settings.get_name_database()
-	>>> Settings.get_table_name_by_code("BL")
-	'black_list'
-	>>> Settings.get_query("BL")  # doctest: +NORMALIZE_WHITESPACE
-	'CREATE TABLE IF NOT EXISTS black_list
-	(number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL, included BOOLEAN NOT NULL)'
-	>>> Settings.is_column_present("url")
-	'url'
-
-	>>> Settings.get_db_connection_parameters()
-	{'host': None, 'port': None, 'database': None, 'user': None, 'password': None}
-	>>> Settings.get_db_connection_parameters(without_database=True)
-	{'host': None, 'port': None, 'user': None, 'password': None}
 	"""
 
-	# Подключение к базе данных
-
-	# Достаём из переменных окружения все необходимые параметры для базы данных
+	# Get database connection parameters from environment variables
 	__db_host = environ.get("DB_HOST")
 	__db_port = environ.get("DB_PORT")
 	__db_name = environ.get("DB_NAME")
@@ -46,9 +29,10 @@ class Settings:
 		"password": __db_password,
 	}
 
-	# Формирование базы данных
+	# Define database schema
 
-	# Тип хранения значений(кортеж), не изменять. По нему происходит поиск названия столбцов # noqa: E501, ERA001
+	# Define columns with their types
+	# Тип хранения значений (кортеж), не изменять. По нему происходит поиск названия столбцов # noqa: E501, ERA001
 	__number = ("number", "INTEGER NOT NULL")
 	__key = ("key", "TEXT NOT NULL")
 	__url = ("url", "TEXT NOT NULL")
@@ -57,6 +41,7 @@ class Settings:
 
 	__header = "CREATE TABLE IF NOT EXISTS "
 
+	# Define tables schemas
 	__database_structure = {  # noqa: RUF012
 		"ST": {
 			"name_table": "search_templates",
@@ -82,14 +67,26 @@ class Settings:
 
 	@classmethod
 	def get_name_database(cls):
-		"""Получить имя файла базы данных."""
+		"""Return the name of the database.
+
+		Examples:
+		>>> Settings.get_name_database()
+		...
+		"""
 		return cls.__db_name
 
 	@classmethod
 	def get_db_connection_parameters(cls, without_database=False):  # noqa: FBT002
-		"""Получить словарь с параметрами для создания/подключения базы данных.
+		"""Return a dictionary with database creation / connection parameters.
 
-		Если without_database=True, то словарь вернётся без параметра db_name
+		Args:
+			without_database (bool): If True, the returned dictionary excludes the "database" key.
+
+		Examples:
+		>>> Settings.get_db_connection_parameters()
+		{'host': None, 'port': None, 'database': None, 'user': None, 'password': None}
+		>>> Settings.get_db_connection_parameters(without_database=True)
+		{'host': None, 'port': None, 'user': None, 'password': None}
 		"""
 		if without_database:
 			# Создаём копию, чтобы не модифицировать основной словарь
@@ -103,13 +100,32 @@ class Settings:
 
 	@classmethod
 	def get_list_codes_tables(cls):
-		"""Получить список всех кодов для имён таблиц."""
+		"""Return a list of all table codes defined in the schema.
+
+		Examples:
+		>>> sorted(Settings.get_list_codes_tables())
+		['BL', 'ST', 'VL']
+		"""
 		return list(cls.__database_structure.keys())
 
 	@classmethod  # noqa: RET503
 	def is_column_present(cls, name_column):
-		"""Проверяет, существует ли указанный столбец в таблицах."""
-		# Извлекаем из текущего класса, все переменные (пары ключ-значения). И оставляем только кортежи # noqa: ERA001, E501
+		"""Check if the specified column name exists in the predefined columns.
+
+		Args:
+			name_column (str): The name of the column.
+
+		Returns:
+			str: The column name if present; otherwise, prints an error message.
+
+		Examples:
+		>>> Settings.is_column_present("url")
+		'url'
+
+		Notes:
+			Извлекаем из текущего класса, все переменные (пары ключ-значения).
+			И оставляем только кортежи
+		"""
 		tuple_used_names = tuple(
 			value for key, value in vars(cls).items() if isinstance(value, tuple)
 		)
@@ -127,7 +143,18 @@ class Settings:
 
 	@classmethod
 	def __check_table_code(cls, table_code):
-		"""Проверяем, содержится ли введённый код в списке имён таблиц."""
+		"""Check if the provided table code exists in the database structure.
+
+		Args:
+			table_code (str): The table code to check.
+
+		Returns:
+			str: The table code if valid; otherwise, prints an error message.
+
+		Examples:
+		>>> Settings._Settings__check_table_code("BL")
+		'BL'
+		"""
 		try:
 			# Делаем тестовый запрос
 			_ = cls.__database_structure[table_code]
@@ -140,6 +167,11 @@ class Settings:
 
 	@classmethod
 	def __get_setting_for_parameter(cls, table_code):
+		"""Generate column definitions for the table corresponding to table_code.
+
+		Yields:
+			str: A string in the form 'column_name data_type'.
+		"""
 		table_code = cls.__check_table_code(table_code)
 		# Так как "name_table" в списке ключей не нужен, используем срез [1::]  # noqa: ERA001
 		list_keys_columns = list(cls.__database_structure[table_code].keys())[1::]
@@ -150,13 +182,33 @@ class Settings:
 
 	@classmethod
 	def get_table_name_by_code(cls, table_code):
-		"""Получить имя таблицы по коду."""
+		"""Return the table name corresponding to the provided table code.
+
+		Args:
+			table_code (str): The table code (e.g., "BL").
+
+		Examples:
+		>>> Settings.get_table_name_by_code("BL")
+		'black_list'
+		"""
 		table_code = cls.__check_table_code(table_code)
 		return cls.__database_structure[table_code]["name_table"]
 
 	@classmethod
 	def get_query(cls, table_code):
-		"""Получить запрос для создания таблицы."""
+		"""Construct and return an SQL query for creating the table for the given table code.
+
+		Args:
+			table_code (str): The code for the desired table.
+
+		Returns:
+			str: SQL query string.
+
+		Examples:
+		>>> Settings.get_query("BL") # doctest: +NORMALIZE_WHITESPACE
+		'CREATE TABLE IF NOT EXISTS black_list
+		(number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL, included BOOLEAN NOT NULL)'
+		"""
 		table_code = cls.__check_table_code(table_code)
 		# Формируем полную шапку запроса
 		full_header = cls.__header + cls.get_table_name_by_code(table_code)
