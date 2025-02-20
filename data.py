@@ -6,19 +6,28 @@ import psycopg2
 
 
 class Settings:
-	"""Example:
+	"""Manage bot settings.
 
-	print(Settings.get_query("BL"))
-	print(Settings.get_table_name_by_code("gf"))
-	print(Settings.get_name_database())
-	Settings.set_name_database("database")
-	print(Settings.get_name_database())
-	print(Settings.is_column_present("BL"))
+	A class for managing database connection settings
+	and constructing SQL queries for table creation (schema).
+	It interacts with environment variables to retrieve connection parameters
+	and provides methods for table and column management.
 
-	print(Settings.get_db_connection_parameters())
-	print(Settings.get_db_connection_parameters(True))
-	print(Settings.get_db_connection_parameters())
-	"""  # noqa: D400, D415
+	Examples:
+	>>> Settings.get_name_database()
+	>>> Settings.get_table_name_by_code("BL")
+	'black_list'
+	>>> Settings.get_query("BL")  # doctest: +NORMALIZE_WHITESPACE
+	'CREATE TABLE IF NOT EXISTS black_list
+	(number INTEGER NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL, included BOOLEAN NOT NULL)'
+	>>> Settings.is_column_present("url")
+	'url'
+
+	>>> Settings.get_db_connection_parameters()
+	{'host': None, 'port': None, 'database': None, 'user': None, 'password': None}
+	>>> Settings.get_db_connection_parameters(without_database=True)
+	{'host': None, 'port': None, 'user': None, 'password': None}
+	"""
 
 	# Подключение к базе данных
 
