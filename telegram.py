@@ -52,6 +52,40 @@ class CS(StatesGroup):
 	CLEAR_VISITS = State()
 
 
+class ProgramState():
+	"""
+	Состояния программы.
+
+		0: START: Программа была запущена.
+		1: PAUSE: Программа приостановлена.
+		2: RESUME: Программа возобновлена.
+	"""
+
+	LIST_STATES = {
+		0: "START",
+		1: "PAUSE",
+		2: "RESUME",
+	}
+
+	current_state_name = None
+	
+	@classmethod
+	def set_state(cls, number_state):
+		cls.current_state_name = cls.LIST_STATES[number_state]
+
+	@classmethod
+	def get_current_state_name(cls):
+		return cls.current_state_name
+
+	@classmethod
+	def get_state_name(cls, state_number):
+		return cls.LIST_STATES[state_number]
+
+	@classmethod
+	def get_all_state(cls):
+		return cls.LIST_STATES.values()
+
+
 min_delay = 0
 max_delay = 180
 current_delay = 10
@@ -71,8 +105,7 @@ async def is_user_ID(message: Message):
 async def cmd_start(message: Message, state: FSMContext):
 	# Только пользователь с допустимым ID сможет получить доступ к боту
 	if await is_user_ID(message):
-		global start
-		start = True
+		ProgramState.set_state(0)
 
 		await message.answer("🖐 Hola! \nВведите /help для доступа к командам")
 		await state.set_state(CS.AVAILABLE)
@@ -80,6 +113,18 @@ async def cmd_start(message: Message, state: FSMContext):
 		await message.answer(
 			"❌  Please leave this chat. You're an unregistered user\nПрошу покинуть этот чат. Вы незарегистрированный пользователь"
 		)
+
+
+@dp.message(Command("resume"), CS.AVAILABLE)
+async def cmd_start_after_pause(message: Message, state: FSMContext):
+	ProgramState.set_state(2)
+	await message.answer("✅ Бот работает!")
+
+
+@dp.message(Command("pause"), CS.AVAILABLE)
+async def cmd_pause(message: Message, state: FSMContext):
+	ProgramState.set_state(1)
+	await message.answer("❌ Бот остановлен! \nВведите /resume для запуска")
 
 
 @dp.message(Command("help"), CS.AVAILABLE)
@@ -471,14 +516,23 @@ async def send_to_user(param):
 
 
 async def background_task():
+	start_state = ProgramState.get_state_name(0)
+	pause_state = ProgramState.get_state_name(1)
+	resume_state = ProgramState.get_state_name(2)
+	
 	while True:
-		if start:
+		current_state = ProgramState.get_current_state_name()
+		if current_state in [start_state, resume_state]:
 			async for all_param in get_param_for_msg():
 				await send_to_user(all_param)
-
+				if current_state == pause_state:
+					break
 			await asyncio.sleep(current_delay * 60)
+		elif current_state == pause_state:
+			await asyncio.sleep(10)
+			
 		else:
-			await asyncio.sleep(1)
+			await asyncio.sleep(10)
 
 
 async def main():
