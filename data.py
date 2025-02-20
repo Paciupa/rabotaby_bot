@@ -38,29 +38,37 @@ class Settings:
 	__lastDateTime = ("last_date_time", "TIMESTAMP NOT NULL")
 	__included = ("included", "BOOLEAN NOT NULL")
 
+	__database_columns = {  # noqa: RUF012
+		"number": ("number", "INTEGER NOT NULL"),
+		"key": ("key", "TEXT NOT NULL"),
+		"url": ("url", "TEXT NOT NULL"),
+		"lastDateTime": ("last_date_time", "TIMESTAMP NOT NULL"),
+		"included": ("included", "BOOLEAN NOT NULL"),
+	}
+
 	__header = "CREATE TABLE IF NOT EXISTS "
 
 	# Define tables schemas
 	__database_structure = {  # noqa: RUF012
 		"ST": {
 			"name_table": "search_templates",
-			"column_1": __number,
-			"column_2": __key,
-			"column_3": __url,
-			"column_4": __included,
+			"column_1": __database_columns["number"],
+			"column_2": __database_columns["key"],
+			"column_3": __database_columns["url"],
+			"column_4": __database_columns["included"],
 		},
 		"BL": {
 			"name_table": "black_list",
-			"column_1": __number,
-			"column_2": __key,
-			"column_3": __url,
-			"column_4": __included,
+			"column_1": __database_columns["number"],
+			"column_2": __database_columns["key"],
+			"column_3": __database_columns["url"],
+			"column_4": __database_columns["included"],
 		},
 		"VL": {
 			"name_table": "visits_list",
-			"column_1": __lastDateTime,
-			"column_2": __key,
-			"column_3": __url,
+			"column_1": __database_columns["lastDateTime"],
+			"column_2": __database_columns["key"],
+			"column_3": __database_columns["url"],
 		},
 	}
 
