@@ -20,7 +20,7 @@ class Settings:
 	"""
 
 	# Get database connection parameters from environment variables
-	__db_connection_parameters = {  # noqa: RUF012
+	__database_connection_parameters = {  # noqa: RUF012
 		"host": environ.get("DB_HOST"),
 		"port": environ.get("DB_PORT"),
 		"database": environ.get("DB_NAME"),
@@ -72,7 +72,7 @@ class Settings:
 		>>> Settings.get_name_database()
 		...
 		"""
-		return cls.__db_connection_parameters["database"]
+		return cls.__database_connection_parameters["database"]
 
 	@classmethod
 	def get_db_connection_parameters(cls, without_database=False):  # noqa: FBT002
@@ -89,13 +89,13 @@ class Settings:
 		"""
 		if without_database:
 			# Создаём копию, чтобы не модифицировать основной словарь
-			copy_db_conn_param = cls.__db_connection_parameters.copy()
+			copy_db_conn_param = cls.__database_connection_parameters.copy()
 			# Удаляем лишнее
 			del copy_db_conn_param["database"]
 			# Возвращаем копию
 			return copy_db_conn_param
 
-		return cls.__db_connection_parameters
+		return cls.__database_connection_parameters
 
 	@classmethod
 	def get_list_codes_tables(cls):
