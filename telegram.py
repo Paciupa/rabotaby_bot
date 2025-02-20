@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from os import environ
 
 from aiogram import Bot, Dispatcher
@@ -487,4 +488,5 @@ async def main():
 
 
 if __name__ == "__main__":
+	logging.basicConfig(level=logging.DEBUG)
 	asyncio.run(main())
