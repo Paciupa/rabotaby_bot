@@ -131,6 +131,8 @@ async def cmd_pause(message: Message, state: FSMContext):
 async def command_help(message: Message):
 	await message.answer("""
 Общие настройки
+/pause - Остановить бота
+/resume - Возобновить работу бота
 /update_time - Установить время обновления вакансий (в минутах)
 /clear_visits - Установить время очистки списка посещений (в часах)
 /print_s - Вывести информацию об общих настройках
