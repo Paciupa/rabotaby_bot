@@ -20,18 +20,12 @@ class Settings:
 	"""
 
 	# Get database connection parameters from environment variables
-	__db_host = environ.get("DB_HOST")
-	__db_port = environ.get("DB_PORT")
-	__db_name = environ.get("DB_NAME")
-	__db_user = environ.get("DB_USER")
-	__db_password = environ.get("DB_PASSWORD")
-
 	__db_connection_parameters = {  # noqa: RUF012
-		"host": __db_host,
-		"port": __db_port,
-		"database": __db_name,
-		"user": __db_user,
-		"password": __db_password,
+		"host": environ.get("DB_HOST"),
+		"port": environ.get("DB_PORT"),
+		"database": environ.get("DB_NAME"),
+		"user": environ.get("DB_USER"),
+		"password": environ.get("DB_PASSWORD"),
 	}
 
 	# Define database schema
@@ -78,7 +72,7 @@ class Settings:
 		>>> Settings.get_name_database()
 		...
 		"""
-		return cls.__db_name
+		return cls.__db_connection_parameters["database"]
 
 	@classmethod
 	def get_db_connection_parameters(cls, without_database=False):  # noqa: FBT002
