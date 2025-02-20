@@ -31,12 +31,13 @@ class Settings:
 	# Define database schema
 
 	# Define columns with their types
-	# Тип хранения значений (кортеж), не изменять. По нему происходит поиск названия столбцов # noqa: E501, ERA001
-	__number = ("number", "INTEGER NOT NULL")
-	__key = ("key", "TEXT NOT NULL")
-	__url = ("url", "TEXT NOT NULL")
-	__lastDateTime = ("last_date_time", "TIMESTAMP NOT NULL")
-	__included = ("included", "BOOLEAN NOT NULL")
+	__database_columns = {  # noqa: RUF012
+		"number": ("number", "INTEGER NOT NULL"),
+		"key": ("key", "TEXT NOT NULL"),
+		"url": ("url", "TEXT NOT NULL"),
+		"lastDateTime": ("last_date_time", "TIMESTAMP NOT NULL"),
+		"included": ("included", "BOOLEAN NOT NULL"),
+	}
 
 	__header = "CREATE TABLE IF NOT EXISTS "
 
@@ -44,23 +45,23 @@ class Settings:
 	__database_structure = {  # noqa: RUF012
 		"ST": {
 			"name_table": "search_templates",
-			"column_1": __number,
-			"column_2": __key,
-			"column_3": __url,
-			"column_4": __included,
+			"column_1": __database_columns["number"],
+			"column_2": __database_columns["key"],
+			"column_3": __database_columns["url"],
+			"column_4": __database_columns["included"],
 		},
 		"BL": {
 			"name_table": "black_list",
-			"column_1": __number,
-			"column_2": __key,
-			"column_3": __url,
-			"column_4": __included,
+			"column_1": __database_columns["number"],
+			"column_2": __database_columns["key"],
+			"column_3": __database_columns["url"],
+			"column_4": __database_columns["included"],
 		},
 		"VL": {
 			"name_table": "visits_list",
-			"column_1": __lastDateTime,
-			"column_2": __key,
-			"column_3": __url,
+			"column_1": __database_columns["lastDateTime"],
+			"column_2": __database_columns["key"],
+			"column_3": __database_columns["url"],
 		},
 	}
 
@@ -108,37 +109,15 @@ class Settings:
 		return list(cls.__database_structure.keys())
 
 	@classmethod  # noqa: RET503
-	def is_column_present(cls, name_column):
-		"""Check if the specified column name exists in the predefined columns.
-
-		Args:
-			name_column (str): The name of the column.
-
-		Returns:
-			str: The column name if present; otherwise, prints an error message.
-
-		Examples:
-		>>> Settings.is_column_present("url")
-		'url'
-
-		Notes:
-			Извлекаем из текущего класса, все переменные (пары ключ-значения).
-			И оставляем только кортежи
-		"""
-		tuple_used_names = tuple(
-			value for key, value in vars(cls).items() if isinstance(value, tuple)
+	def is_column_present(cls, column_name):
+		"""Check if the specified column name exists in the predefined columns."""
+		column_names = tuple(column[0] for column in cls.__database_columns.values())
+		if column_name in column_names:
+			return column_name
+		print(
+			f"Некорректное имя столбца => {column_name}. "
+			f"Введите один из доступных => {column_names}"
 		)
-		# Извлекаем из кортежей имена таблиц, и записываем в список
-		list_all_names_columns = list([name for name, _ in tuple_used_names])  # noqa: C411
-
-		# TODO исправить этот костыль  # noqa: ERA001, FIX002, TD002, TD003, TD004
-		if name_column in list_all_names_columns:
-			# передаём дальше значение, если всё хорошо
-			return name_column
-		else:  # noqa: RET505
-			print(
-				f"Некорректное имя столбца => {name_column}. Введите один из доступных => {list_all_names_columns}"  # noqa: E501
-			)
 
 	@classmethod
 	def __check_table_code(cls, table_code):

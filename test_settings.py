@@ -71,7 +71,7 @@ def test_settings_methods_case_sensitivity(method_to_test, arg):
 			"is_column_present",
 			(
 				"Некорректное имя столбца => {}. Введите один из доступных "
-				"=> ['number', 'key', 'url', 'last_date_time', 'included']\n"
+				"=> ('number', 'key', 'url', 'last_date_time', 'included')\n"
 			),
 		),
 		(
