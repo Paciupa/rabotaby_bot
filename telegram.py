@@ -88,8 +88,7 @@ class ProgramState():
 
 min_delay = 0
 max_delay = 180
-current_delay = 10
-
+current_delay = 2
 start = False
 
 
@@ -524,16 +523,24 @@ async def background_task():
 	
 	while True:
 		current_state = ProgramState.get_current_state_name()
+		print(f"current_state = {start_state}")
 		if current_state in [start_state, resume_state]:
 			async for all_param in get_param_for_msg():
+				# Если пользователь ввел команду остановки, прерываем парсинг и переходим в другое состояние.
 				await send_to_user(all_param)
+				print("Вывод вакансии")
 				if current_state == pause_state:
+					print("! Выход из цикла")
 					break
+			print("!Запуск большой задержки")
 			await asyncio.sleep(current_delay * 60)
+			
 		elif current_state == pause_state:
+			print("ПРОГРАММА НА ПАУЗЕ")
 			await asyncio.sleep(10)
 			
 		else:
+			print("Неизвестное состояние программы, или она не включена")
 			await asyncio.sleep(10)
 
 
