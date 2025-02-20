@@ -65,11 +65,11 @@ class Settings:
 	}
 
 	@classmethod
-	def get_name_database(cls):
+	def get_database_name(cls):
 		"""Return the name of the database.
 
 		Examples:
-		>>> Settings.get_name_database()
+		>>> Settings.get_database_name()
 		...
 		"""
 		return cls.__database_connection_parameters["database"]
@@ -234,7 +234,7 @@ class Base:
 		self.parameters_without_database = Settings.get_db_connection_parameters(
 			without_database=True
 		)
-		self.db_name = Settings.get_name_database()
+		self.db_name = Settings.get_database_name()
 
 		self.table_code = table_code
 		self.name_table = Settings.get_table_name_by_code(self.table_code)
