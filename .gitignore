@@ -11,7 +11,21 @@ dist/
 
 .venv*/
 
-.idea/
+# For PyCharm. Reference: https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/usage.statistics.xml
+.idea/**/shelf
+.idea/**/dictionaries
+.idea/**/tasks.xml
+# Sensitive or high-churn files
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+# Editor-based Rest Client
+.idea/httpRequests
+
 .vscode/
 
 temp/
