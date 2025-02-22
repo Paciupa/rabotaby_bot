@@ -1,8 +1,13 @@
 # import threading  # noqa: ERA001, D100
+import logging
+import sys
 from datetime import datetime, timedelta
 from os import environ
 
 import psycopg2
+
+logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+logger = logging.getLogger(__name__)
 
 
 class Settings:
@@ -230,6 +235,7 @@ class Base:
 	""" """  # noqa: D419
 
 	def __init__(self, table_code):  # noqa: D107
+		logger.info("Initializing Base class for table_code: %s", table_code)
 		self.all_parameters = Settings.get_db_connection_parameters()
 		self.parameters_without_database = Settings.get_db_connection_parameters(
 			without_database=True
@@ -254,25 +260,28 @@ class Base:
 	# noinspection PyAttributeOutsideInit
 	def connect_to_database(self, parameters_database):
 		"""Подключаемся к базе данных."""
+		logger.debug("Connecting to database with parameters: %s", parameters_database)
 		self.connection = psycopg2.connect(**parameters_database)
 		self.cursor = self.connection.cursor()
+		logger.info("Successfully connected to database %s.", self.db_name)
 
 	def database_exists(self):
-		"""Создание новой базы данных, если её не существует."""
+		"""Create a database if it doesn't exist."""
 		self.connect_to_database(self.parameters_without_database)
+		# noinspection PyBroadException
 		try:
 			self.connection.set_session(autocommit=True)
 			# Создание пустой базы данных
 			self.cursor.execute(f"CREATE DATABASE {self.db_name};")
-			print(f"База данных '{self.db_name}' создана успешно.")
-
+			logger.info("Database '%s' created successfully.", self.db_name)
 		except psycopg2.errors.DuplicateDatabase:
 			# Если база данных уже создана, то ошибку не выводим,
 			# а возвращаем базу данных к состоянию до выполнения запроса
+			logger.exception("Database '%s' already exists, skipping creation.", self.db_name)
 			self.connection.rollback()
-		except Exception as e:  # noqa: BLE001
+		except Exception:
 			# Обработка остальных ошибок при создании базы данных
-			print(f"Ошибка при создании базы данных: {e}")
+			logger.exception("Error while creating database '%s'.", self.db_name)
 			# Возвращаем базу данных к состоянию до выполнения запроса
 			self.connection.rollback()
 		finally:
@@ -284,6 +293,7 @@ class Base:
 
 		self.cursor.execute(Settings.get_query(table_code))
 		self.saving_changes()
+		logger.info("Table '%s' checked/created.", self.name_table)
 
 	def get_num_all_rows(self):
 		""" """  # noqa: D419
@@ -322,10 +332,12 @@ class Base:
 
 		self.saving_changes()
 
-	def close(self):  # noqa: D102
+	def close(self):
+		"""Close the database connection."""
 		self.saving_changes()
 		self.cursor.close()
 		self.connection.close()
+		logger.info("Database '%s' connection closed successfully.", self.db_name)
 
 
 class SearchTemplates(Base):
