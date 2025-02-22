@@ -12,8 +12,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message
 
-import parsing
 from data import BlackList, SearchTemplates, VisitsList
+from parsing import get_param_for_msg
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
 telegram_key = environ.get("API_TELEGRAM_KEY")
@@ -471,7 +471,7 @@ async def send_to_user(param):
 async def background_task():
 	while True:
 		if start:
-			async for all_param in parsing.get_param_for_msg():
+			async for all_param in get_param_for_msg():
 				await send_to_user(all_param)
 
 			await asyncio.sleep(current_delay * 60)
