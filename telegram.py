@@ -1,4 +1,6 @@
 import asyncio
+import logging
+import sys
 from os import environ
 
 from aiogram import Bot, Dispatcher
@@ -12,8 +14,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import Message
 
-import parsing
 from data import BlackList, SearchTemplates, VisitsList
+from parsing import get_param_for_msg
 
 # Извлекаем из виртуальной среды переменные окружения. API токен и id пользователя
 telegram_key = environ.get("API_TELEGRAM_KEY")
@@ -223,7 +225,7 @@ async def state_t_state(message: Message, state: FSMContext):
 	number_template = data.get("NUMBER")
 	# Извлекаем номер шаблона
 
-	new_state = True if input_state == 1 else False
+	new_state = input_state == 1
 	st.set_states_template(number_template, new_state)
 	await message.answer("✅ Состояние шаблона успешно изменено!")
 	await state.set_state(CS.AVAILABLE)
@@ -355,7 +357,7 @@ async def state_b_state(message: Message, state: FSMContext):
 	number_exception = data.get("NUMBER")
 	# Извлекаем номер исключения
 
-	new_state = True if input_state == 1 else False
+	new_state = input_state == 1
 	bl.set_states_template(number_exception, new_state)
 	await message.answer("✅ Состояние исключения успешно изменено!")
 	await state.set_state(CS.AVAILABLE)
@@ -471,7 +473,7 @@ async def send_to_user(param):
 async def background_task():
 	while True:
 		if start:
-			async for all_param in parsing.get_param_for_msg():
+			async for all_param in get_param_for_msg():
 				await send_to_user(all_param)
 
 			await asyncio.sleep(current_delay * 60)
@@ -487,4 +489,5 @@ async def main():
 
 
 if __name__ == "__main__":
+	logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 	asyncio.run(main())
