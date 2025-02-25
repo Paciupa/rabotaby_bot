@@ -163,11 +163,11 @@ external = [
 # in tests:
 # https://github.com/astral-sh/ruff/issues/4368
 
-# assert use, ends-in-period, unused-variable
-"tests/**/*.py" = ["S101", "D400", "F841"]
-"test_*" = ["S101", "D400", "F841"]
-"*_test" = ["S101", "D400", "F841"]
-"*_test_*" = ["S101", "D400", "F841"]
+# assert use, ends-in-period, unused-variable, unused-function-argument
+"tests/**/*.py" = ["S101", "D400", "F841", "ARG001"]
+"test_*" = ["S101", "D400", "F841", "ARG001"]
+"*_test" = ["S101", "D400", "F841", "ARG001"]
+"*_test_*" = ["S101", "D400", "F841", "ARG001"]
 
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
