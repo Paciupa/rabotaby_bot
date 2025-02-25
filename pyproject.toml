@@ -17,6 +17,7 @@ dev = [
     "pytest",
     "pytest-env",
     "pytest-cov",
+    "types-psycopg2",
 ]
 
 
