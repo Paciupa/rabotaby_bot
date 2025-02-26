@@ -55,3 +55,10 @@ from data import Settings
 def test_settings_methods(method_to_test, args, expected_result):
 	result = getattr(Settings, method_to_test)(*args)
 	assert result == expected_result
+
+
+@pytest.mark.parametrize(
+	("method_to_test", "arg"), [("is_column_present", "URL"), ("_Settings__check_table_code", "bl")]
+)
+def test_settings_methods_case_sensitivity(method_to_test, arg):
+	assert getattr(Settings, method_to_test)(arg) is None
