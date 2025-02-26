@@ -56,3 +56,24 @@ def test_is_column_present_with_invalid_column(capsys):
 	)
 	assert Settings.is_column_present(invalid_column_name) is None
 	assert capsys.readouterr().out == expected_output
+
+
+def test__check_table_code_with_valid_code():
+	# noinspection PyUnresolvedReferences
+	assert Settings._Settings__check_table_code("BL") == "BL"  # noqa: SLF001
+
+
+def test__check_table_code_case_sensitivity():
+	# noinspection PyUnresolvedReferences
+	assert Settings._Settings__check_table_code("bl") is None  # noqa: SLF001
+
+
+def test__check_table_code_with_invalid_code(capsys):
+	invalid_table_code = "invalid_column"
+	expected_output = (
+		f"Некорректный код => {invalid_table_code}. "
+		f"Введите один из доступных => ['ST', 'BL', 'VL']\n"
+	)
+	# noinspection PyUnresolvedReferences
+	assert Settings._Settings__check_table_code(invalid_table_code) is None  # noqa: SLF001
+	assert capsys.readouterr().out == expected_output
