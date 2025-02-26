@@ -100,3 +100,35 @@ def test__get_setting_for_parameter_with_invalid_table_code():
 	with pytest.raises(KeyError, match="None"):
 		# noinspection PyUnresolvedReferences
 		_ = tuple(Settings._Settings__get_setting_for_parameter("invalid_table_code"))  # noqa: SLF001
+
+
+def test_get_table_name_by_code_with_valid_table_code():
+	assert Settings.get_table_name_by_code("BL") == "black_list"
+
+
+def test_get_table_name_by_code_case_sensitivity():
+	with pytest.raises(KeyError, match="None"):
+		_ = Settings.get_table_name_by_code("bl")
+
+
+def test_get_table_name_by_code_with_invalid_table_code():
+	with pytest.raises(KeyError, match="None"):
+		_ = Settings.get_table_name_by_code("invalid_table_code")
+
+
+def test_get_query_with_valid_table_code():
+	expected_output = (
+		"CREATE TABLE IF NOT EXISTS visits_list "
+		"(last_date_time TIMESTAMP NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL)"
+	)
+	assert Settings.get_query("VL") == expected_output
+
+
+def test_get_query_case_sensitivity():
+	with pytest.raises(KeyError, match="None"):
+		_ = Settings.get_query("vl")
+
+
+def test_get_query_with_invalid_table_code():
+	with pytest.raises(KeyError, match="None"):
+		_ = Settings.get_query("invalid_table_code")
