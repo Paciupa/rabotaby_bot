@@ -62,3 +62,24 @@ def test_settings_methods(method_to_test, args, expected_result):
 )
 def test_settings_methods_case_sensitivity(method_to_test, arg):
 	assert getattr(Settings, method_to_test)(arg) is None
+
+
+@pytest.mark.parametrize(
+	("method_to_test", "expected_output"),
+	[
+		(
+			"is_column_present",
+			(
+				"Некорректное имя столбца => {}. Введите один из доступных "
+				"=> ['number', 'key', 'url', 'last_date_time', 'included']\n"
+			),
+		),
+		(
+			"_Settings__check_table_code",
+			"Некорректный код => {}. Введите один из доступных => ['ST', 'BL', 'VL']\n",
+		),
+	],
+)
+def test_settings_methods_stdout(capsys, method_to_test, expected_output):
+	assert getattr(Settings, method_to_test)("invalid_argument") is None
+	assert capsys.readouterr().out == expected_output.format("invalid_argument")
