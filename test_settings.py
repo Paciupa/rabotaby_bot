@@ -97,3 +97,21 @@ def test_settings_methods_stdout(capsys, method_to_test, expected_output):
 def test_settings_methods_exception(method_to_test, arg):
 	with pytest.raises(KeyError, match="None"):
 		_ = getattr(Settings, method_to_test)(arg)
+
+
+def test__get_setting_for_parameter_with_valid_table_code():
+	expected_output = (
+		"number INTEGER NOT NULL",
+		"key TEXT NOT NULL",
+		"url TEXT NOT NULL",
+		"included BOOLEAN NOT NULL",
+	)
+	# noinspection PyUnresolvedReferences
+	assert tuple(Settings._Settings__get_setting_for_parameter("BL")) == expected_output  # noqa: SLF001
+
+
+@pytest.mark.parametrize("arg", ["bl", "invalid_table_code"])
+def test__get_setting_for_parameter_exception(arg):
+	with pytest.raises(KeyError, match="None"):
+		# noinspection PyUnresolvedReferences
+		_ = tuple(Settings._Settings__get_setting_for_parameter(arg))  # noqa: SLF001
