@@ -4,6 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
+      <excludeFolder url="file://$MODULE_DIR$/.qodo" />
     </content>
     <orderEntry type="jdk" jdkName="uv (rabotaby_bot)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
