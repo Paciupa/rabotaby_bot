@@ -77,3 +77,26 @@ def test__check_table_code_with_invalid_code(capsys):
 	# noinspection PyUnresolvedReferences
 	assert Settings._Settings__check_table_code(invalid_table_code) is None  # noqa: SLF001
 	assert capsys.readouterr().out == expected_output
+
+
+def test__get_setting_for_parameter_with_valid_table_code():
+	expected_output = (
+		"number INTEGER NOT NULL",
+		"key TEXT NOT NULL",
+		"url TEXT NOT NULL",
+		"included BOOLEAN NOT NULL",
+	)
+	# noinspection PyUnresolvedReferences
+	assert tuple(Settings._Settings__get_setting_for_parameter("BL")) == expected_output  # noqa: SLF001
+
+
+def test__get_setting_for_parameter_case_sensitivity():
+	with pytest.raises(KeyError, match="None"):
+		# noinspection PyUnresolvedReferences
+		_ = tuple(Settings._Settings__get_setting_for_parameter("bl"))  # noqa: SLF001
+
+
+def test__get_setting_for_parameter_with_invalid_table_code():
+	with pytest.raises(KeyError, match="None"):
+		# noinspection PyUnresolvedReferences
+		_ = tuple(Settings._Settings__get_setting_for_parameter("invalid_table_code"))  # noqa: SLF001
