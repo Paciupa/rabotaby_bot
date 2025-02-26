@@ -83,3 +83,17 @@ def test_settings_methods_case_sensitivity(method_to_test, arg):
 def test_settings_methods_stdout(capsys, method_to_test, expected_output):
 	assert getattr(Settings, method_to_test)("invalid_argument") is None
 	assert capsys.readouterr().out == expected_output.format("invalid_argument")
+
+
+@pytest.mark.parametrize(
+	("method_to_test", "arg"),
+	[
+		("get_table_name_by_code", "bl"),
+		("get_table_name_by_code", "invalid_table_code"),
+		("get_query", "vl"),
+		("get_query", "invalid_table_code"),
+	],
+)
+def test_settings_methods_exception(method_to_test, arg):
+	with pytest.raises(KeyError, match="None"):
+		_ = getattr(Settings, method_to_test)(arg)
