@@ -38,3 +38,21 @@ def test_get_list_codes_tables():
 	expected_code_tables = ["ST", "BL", "VL"]
 	actual_code_tables = Settings.get_list_codes_tables()
 	assert sorted(actual_code_tables) == sorted(expected_code_tables)
+
+
+def test_is_column_present_with_valid_column():
+	assert Settings.is_column_present("url") == "url"
+
+
+def test_is_column_present_case_sensitivity():
+	assert Settings.is_column_present("URL") is None
+
+
+def test_is_column_present_with_invalid_column(capsys):
+	invalid_column_name = "invalid_column"
+	expected_output = (
+		f"Некорректное имя столбца => {invalid_column_name}. "
+		f"Введите один из доступных => ['number', 'key', 'url', 'last_date_time', 'included']\n"
+	)
+	assert Settings.is_column_present(invalid_column_name) is None
+	assert capsys.readouterr().out == expected_output
