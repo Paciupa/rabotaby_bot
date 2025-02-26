@@ -28,11 +28,28 @@ from data import Settings
 				"password": "p7As5s",
 			},
 		),
+		("get_list_codes_tables", (), ["ST", "BL", "VL"]),
+		("is_column_present", ("url",), "url"),
+		("_Settings__check_table_code", ("BL",), "BL"),
+		("get_table_name_by_code", ("BL",), "black_list"),
+		(
+			"get_query",
+			("VL",),
+			(
+				"CREATE TABLE IF NOT EXISTS visits_list "
+				"(last_date_time TIMESTAMP NOT NULL, key TEXT NOT NULL, url TEXT NOT NULL)"
+			),
+		),
 	],
 	ids=[
 		"get_database_name",
 		"get_database_connection_parameters_full",
 		"get_database_connection_parameters_without_name",
+		"get_list_codes_tables",
+		"is_column_present_with_valid_column",
+		"__check_table_code_with_valid_code",
+		"get_table_name_by_code_with_valid_table_code",
+		"get_query_with_valid_table_code",
 	],
 )
 def test_settings_methods(method_to_test, args, expected_result):
