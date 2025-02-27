@@ -140,7 +140,8 @@ class Settings:
 			return table_code  # noqa: TRY300
 		except KeyError:
 			print(
-				f"Некорректный код => {table_code}. Введите один из доступных => {cls.get_list_codes_tables()}"  # noqa: E501
+				f"Некорректный код => {table_code}. "
+				f"Введите один из доступных => {cls.get_list_codes_tables()}"
 			)
 
 	@classmethod
@@ -154,7 +155,8 @@ class Settings:
 		# Так как "name_table" в списке ключей не нужен, используем срез [1::]  # noqa: ERA001
 		list_keys_columns = list(cls.__database_structure[table_code].keys())[1::]
 		for key_column in list_keys_columns:
-			# Получаем по ключу_столбца кортеж(имя и настройки). Потом собираем в строку с помощью " ".join  # noqa: ERA001, E501
+			# Получаем по ключу_столбца кортеж (имя и настройки).  # noqa: ERA001
+			# Потом собираем в строку с помощью " ".join
 			# Пример вывода одной итерации: "numberVisits INTEGER NOT NULL"  # noqa: ERA001
 			yield " ".join(cls.__database_structure[table_code][key_column])
 
@@ -192,7 +194,9 @@ class Settings:
 		full_header = cls.__header + cls.get_table_name_by_code(table_code)
 
 		# Получаем список всех параметров для запроса
-		# Количество параметров для запроса = количество столбцов для каждой таблицы = количество запросов yield # noqa: ERA001, E501
+		# Количество параметров для запроса = # noqa: ERA001
+		# количество столбцов для каждой таблицы = # noqa: ERA001
+		# количество запросов yield
 		list_all_parameters = list(i for i in cls.__get_setting_for_parameter(table_code))  # noqa: C400
 
 		# Создаём запрос
@@ -344,7 +348,9 @@ class SearchTemplates(Base):
 		rows = self.cursor.fetchall()
 
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
-		# Предположу, что использование вот такого варианта list(range(1, len(self.get_num_all_rows())+1)), забирает чуть больше ресурсов.  # noqa: ERA001, E501
+		# Предположу, что использование вот такого варианта
+		# list(range(1, len(self.get_num_all_rows())+1)),  # noqa: ERA001
+		# забирает чуть больше ресурсов.
 		# Поэтому реализовал без обращения к методу
 		list_new_numbers = list(range(1, len(rows) + 1))
 		# Обновите столбец 'number' с новыми значениями
@@ -369,7 +375,8 @@ class SearchTemplates(Base):
 			f"UPDATE {self.name_table} SET {self.included} = %s WHERE {self.number} = %s",  # noqa: S608
 			(new_state, number),
 		)
-		# Сортируем строки по номеру, так как после изменения состояния, строка смещается(почему?) # noqa: E501, ERA001
+		# Сортируем строки по номеру,
+		# так как после изменения состояния, строка смещается (почему?) # noqa: ERA001
 		self.__update_col_number()
 
 	def get_key_by_number(self, number_template):
