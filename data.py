@@ -403,7 +403,7 @@ class VisitsList(Base):
 	def __init__(self):  # noqa: D107
 		super().__init__(table_code="VL")
 		self.key = Settings.is_column_present("key")
-		self.lastDateTime = Settings.is_column_present("last_date_time")
+		self.last_date_time = Settings.is_column_present("last_date_time")
 
 	@classmethod
 	def get_pattern(cls):  # noqa: D102
@@ -436,7 +436,7 @@ class VisitsList(Base):
 		time_threshold = current_datetime - timedelta(hours=self.get_time_clear())
 
 		self.cursor.execute(
-			f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.lastDateTime} < %s",  # noqa: S608
+			f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.last_date_time} < %s",  # noqa: S608
 			(key, time_threshold),
 		)
 
