@@ -35,7 +35,7 @@ class Settings:
 		"number": ("number", "INTEGER NOT NULL"),
 		"key": ("key", "TEXT NOT NULL"),
 		"url": ("url", "TEXT NOT NULL"),
-		"lastDateTime": ("last_date_time", "TIMESTAMP NOT NULL"),
+		"last_date_time": ("last_date_time", "TIMESTAMP NOT NULL"),
 		"included": ("included", "BOOLEAN NOT NULL"),
 	}
 
@@ -59,7 +59,7 @@ class Settings:
 		},
 		"VL": {
 			"name_table": "visits_list",
-			"column_1": __database_columns["lastDateTime"],
+			"column_1": __database_columns["last_date_time"],
 			"column_2": __database_columns["key"],
 			"column_3": __database_columns["url"],
 		},
