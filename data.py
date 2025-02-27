@@ -111,12 +111,12 @@ class Settings:
 	@classmethod  # noqa: RET503
 	def is_column_present(cls, column_name):
 		"""Check if the specified column name exists in the predefined columns."""
-		column_names = tuple(column[0] for column in cls.__database_columns.values())
+		column_names = cls.__database_columns.keys()
 		if column_name in column_names:
 			return column_name
 		print(
 			f"Некорректное имя столбца => {column_name}. "
-			f"Введите один из доступных => {column_names}"
+			f"Введите один из доступных => {tuple(column_names)}"
 		)
 
 	@classmethod
