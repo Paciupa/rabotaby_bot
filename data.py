@@ -452,3 +452,7 @@ class VisitsList(Base):
 	def delete_rows_by_key(self, key):
 		"""Удаляем строки по ключу."""
 		super().delete_row_by_value(self.key, key)
+
+
+if __name__ == "__main__":
+	print(Settings.is_column_present("url"))
