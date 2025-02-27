@@ -44,14 +44,14 @@ repos:
 
 # https://stackoverflow.com/questions/64011304/running-pytest-as-a-pre-commit-hook-no-such-file-or-directory-issue
 # https://github.com/pre-commit/pre-commit/issues/761#issuecomment-394167542
-# - repo: local
-#   hooks:
-#     - id: pytest
-#       name: pytest
-#       entry: .venv/Scripts/pytest.exe
-#       language: system
-#       pass_filenames: false
-#       always_run: true
+- repo: local
+  hooks:
+    - id: pytest
+      name: pytest
+      entry: .venv/Scripts/pytest.exe
+      language: system
+      pass_filenames: false
+      always_run: true
 
 # https://jorisroovers.com/gitlint/latest/commit_hooks/#pre-commit
 # https://github.com/jorisroovers/gitlint/issues/255
