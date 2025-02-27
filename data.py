@@ -275,18 +275,18 @@ class Base:
 	def get_num_all_rows(self):
 		""" """  # noqa: D419
 		# Получаем количество строк в таблице
-		self.cursor.execute(f"SELECT COUNT(*) FROM {self.name_table}")  # noqa: S608
+		self.cursor.execute(f"SELECT COUNT(*) FROM {self.name_table}")
 		return self.cursor.fetchone()[0]
 
 	def get_all_from_table(self):
 		"""Получить все данные таблицы."""
 		print(self.name_table)
-		self.cursor.execute(f"SELECT * FROM {self.name_table}")  # noqa: S608
+		self.cursor.execute(f"SELECT * FROM {self.name_table}")
 		return self.cursor.fetchall()
 
 	def get_col_by_name(self, col_name):
 		"""Возвращает весь столбец по имени."""
-		self.cursor.execute(f"SELECT {col_name} FROM {self.name_table}")  # noqa: S608
+		self.cursor.execute(f"SELECT {col_name} FROM {self.name_table}")
 		raw_list_of_keys = self.cursor.fetchall()
 		return [key[0] for key in raw_list_of_keys]
 
@@ -297,7 +297,7 @@ class Base:
 		query_parameters = f"({', '.join(placeholders)})"
 
 		# Формируем сам запрос
-		query = f"INSERT INTO {name_table} VALUES {query_parameters}"  # noqa: S608
+		query = f"INSERT INTO {name_table} VALUES {query_parameters}"
 
 		# Создаём новую строку
 		self.cursor.execute(query, args)
@@ -305,7 +305,7 @@ class Base:
 
 	def delete_row_by_value(self, name_row, value):
 		"""Удаляем строку/строки по значению в столбце."""
-		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {name_row}=%s", (value,))  # noqa: S608
+		self.cursor.execute(f"DELETE FROM {self.name_table} WHERE {name_row}=%s", (value,))
 
 		self.saving_changes()
 
@@ -344,7 +344,7 @@ class SearchTemplates(Base):
 	def __update_col_number(self):
 		"""Обновляем числа в столбце с числами."""
 		# Запрос выберет все данные из таблицы, отсортировав строки по значению столбца number.
-		self.cursor.execute(f"SELECT * FROM {self.name_table} ORDER BY {self.number}")  # noqa: S608
+		self.cursor.execute(f"SELECT * FROM {self.name_table} ORDER BY {self.number}")
 		rows = self.cursor.fetchall()
 
 		# Создаём список. От 1 до максимума. Где максимум, это количество строк в таблице
@@ -358,7 +358,7 @@ class SearchTemplates(Base):
 			# Получаем старое значение number в строке, чтобы потом его заменить на новое
 			old_number = rows[new_number - 1][0]
 			self.cursor.execute(
-				f"UPDATE {self.name_table} SET {self.number} = %s WHERE {self.number} = %s",  # noqa: S608
+				f"UPDATE {self.name_table} SET {self.number} = %s WHERE {self.number} = %s",
 				(new_number, old_number),
 			)
 
@@ -372,7 +372,7 @@ class SearchTemplates(Base):
 		Если False - то шаблон/исключение не используется в поиске
 		"""
 		self.cursor.execute(
-			f"UPDATE {self.name_table} SET {self.included} = %s WHERE {self.number} = %s",  # noqa: S608
+			f"UPDATE {self.name_table} SET {self.included} = %s WHERE {self.number} = %s",
 			(new_state, number),
 		)
 		# Сортируем строки по номеру,
@@ -382,7 +382,7 @@ class SearchTemplates(Base):
 	def get_key_by_number(self, number_template):
 		"""Получить ключ зная номер шаблона."""
 		self.cursor.execute(
-			f"SELECT {self.key} FROM {self.name_table} WHERE {self.number} = %s;",  # noqa: S608
+			f"SELECT {self.key} FROM {self.name_table} WHERE {self.number} = %s;",
 			(number_template,),
 		)
 		return self.cursor.fetchone()[0]
@@ -443,7 +443,7 @@ class VisitsList(Base):
 		time_threshold = current_datetime - timedelta(hours=self.get_time_clear())
 
 		self.cursor.execute(
-			f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.last_date_time} < %s",  # noqa: S608
+			f"DELETE FROM {self.name_table} WHERE {self.key} = %s AND {self.last_date_time} < %s",
 			(key, time_threshold),
 		)
 

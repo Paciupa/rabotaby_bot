@@ -170,6 +170,8 @@ external = [
 "*_test" = ["S101", "D100", "D103", "D400", "F841", "ARG001"]
 "*_test_*" = ["S101", "D100", "D103", "D400", "F841", "ARG001"]
 
+"data.py" = ["S608"]
+
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
 
